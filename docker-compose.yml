@@ -10,7 +10,7 @@ services:
       APP_ENV: "production"
       APP_DEBUG: "false"
       APP_KEY: "base64:D5oGA+zhFSVA3VwuoZoQ21RAcwBtJv/RGiqOcZ7BUvI="
-      APP_URL: "http://127.0.0.1"
+      APP_URL: "http://0.0.0.0"
       APP_TIMEZONE: "Europe/Berlin"
       APP_LOCALE: "EN"
       MYSQL_ROOT_PASSWORD: "psssssstveryerysecret"
