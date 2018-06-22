@@ -7,7 +7,7 @@ services:
     restart: always
     image: snipe/snipe-it:latest
     env_file:
-      - snipeit.production
+      - ./.env.production
     links:
       - snipeit_db:mysql
     ports:
@@ -19,6 +19,6 @@ services:
     restart: always
     image: mysql:5.6
     env_file:
-      - snipeit.production
+      - ./.env.production
     ports:
       - 3306:3306
