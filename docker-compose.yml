@@ -2,36 +2,23 @@ version: "3"
 
 services:
 
- snipeit1:
-    container_name: snipeit1
+ snipeit-web:
+    container_name: snipeit-web
     restart: always
     image: snipe/snipe-it:latest
-    environment:
-      APP_ENV: "production"
-      APP_DEBUG: "false"
-      APP_KEY: "base64:D5oGA+zhFSVA3VwuoZoQ21RAcwBtJv/RGiqOcZ7BUvI="
-      APP_URL: "http://0.0.0.0"
-      APP_TIMEZONE: "Europe/Berlin"
-      APP_LOCALE: "EN"
-      MYSQL_ROOT_PASSWORD: "psssssstveryerysecret"
-      MYSQL_DATABASE: "snipeit"
-      MYSQL_USER: "snipeit"
-      MYSQL_PASSWORD: "psssssstveryerysecret"
-      MYSQL_PORT_3306_TCP_ADDR: "mysql"
+    env_file:
+      - snipeit.production
     links:
-      - snipeit_db1:mysql
+      - snipeit_db:mysql
     ports:
       - 80:80
       - 443:443
 
- snipeit_db1:
-    container_name: snipeit_db1
+ snipeit_db:
+    container_name: snipeit_db
     restart: always
     image: mysql:5.6
-    environment:
-       MYSQL_ROOT_PASSWORD: "psssssstveryerysecret"
-       MYSQL_DATABASE: "snipeit"
-       MYSQL_USER: "snipeit"
-       MYSQL_PASSWORD: "psssssstveryerysecret"
+    env_file:
+      - snipeit.production
     ports:
       - 3306:3306
