@@ -151,8 +151,8 @@ return [
     | Logging Detail
     |--------------------------------------------------------------------------
     |
-    | By default, Laravel writes all log levels to storage. However, in your 
-    | production environment, you may wish to configure the minimum severity that 
+    | By default, Laravel writes all log levels to storage. However, in your
+    | production environment, you may wish to configure the minimum severity that
     | should be logged by editing your APP_LOG_LEVEL env config.
     |
     | Laravel will log all levels greater than or equal to the specified severity.
@@ -163,7 +163,7 @@ return [
     | "debug", "info", "notice", "warning", "error", "critical", "alert", "emergency"
     |
     */
-    
+
     'log_level' => env('APP_LOG_LEVEL', 'error'),
 
 
