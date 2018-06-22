@@ -1,24 +1,96 @@
-version: "3"
+version: '2.3'
+
+x-lagoon-project:
+  &lagoon-project snipeit
+
+x-volumes:
+  &default-volumes
+    volumes:
+      - ./:/app:delegated
+
+x-environment:
+  &default-environment
+    LAGOON_PROJECT: *lagoon-project
+    # Route that should be used locally
+    LAGOON_ROUTE: http://snipeit.docker.amazee.io
+    # Uncomment if you like to have the system behave like in production
+    #LAGOON_ENVIRONMENT_TYPE: production
+    # Uncomment to enable xdebug and then restart via `docker-compose up -d`
+    #XDEBUG_ENABLE: "true"
 
 services:
 
- snipeit-web:
-    container_name: snipeit-web
-    restart: always
-    image: snipe/snipe-it:latest
-    env_file:
-      - ./.env.production
-    links:
-      - snipeit_db:mysql
-    ports:
-      - 80:80
-      - 443:443
+  cli: # cli container, used for executing composer and any local commands (artisan, etc)
+    build:
+      context: .
+      dockerfile: Dockerfile.cli
+    image: *lagoon-project # this image will be reused as `CLI_IMAGE` in subsequent Docker builds
+    labels:
+      lagoon.type: cli
+    << : *default-volumes # loads the defined volumes from the top
+    volumes_from: # mount the ssh-agent from the pygmy or cachalot ssh-agent
+      - container:amazeeio-ssh-agent
+    environment:
+      << : *default-environment # loads the defined environment variables from the top
+    depends_on:
+      - mariadb
 
- snipeit_db:
-    container_name: snipeit_db
-    restart: always
-    image: mariadb:10.1.34
-    env_file:
-      - ./.env.production
+  artisan-worker: # worker container, used for executing artisan queue:work
+    build:
+      context: .
+      dockerfile: Dockerfile.artisan-worker
+    labels:
+      # Lagoon Labels
+      lagoon.type: cli
+    << : *default-volumes # loads the defined volumes from the top
+    volumes_from: # mount the ssh-agent from the pygmy or cachalot ssh-agent
+      - container:amazeeio-ssh-agent
+    environment:
+      << : *default-environment # loads the defined environment variables from the top
+    depends_on:
+      - mariadb
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+      args:
+        CLI_IMAGE: *lagoon-project # Inject the name of the cli image
+    labels:
+      lagoon.type: nginx-php
+    << : *default-volumes # loads the defined volumes from the top
+    depends_on:
+      - cli
+    environment:
+      << : *default-environment # loads the defined environment variables from the top
+    networks:
+      - amazeeio-network
+      - default
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+      args:
+        CLI_IMAGE: *lagoon-project
+    labels:
+      lagoon.type: nginx-php
+      lagoon.name: nginx # we want this service be part of the nginx pod in Lagoon
+    << : *default-volumes # loads the defined volumes from the top
+    depends_on:
+      - cli
+    environment:
+      << : *default-environment # loads the defined environment variables from the top
+
+  mariadb:
+    image: amazeeio/mariadb
+    labels:
+      lagoon.type: mariadb
     ports:
-      - 3306:3306
+      - "3306" # exposes the port 3306 with a random local port, find it with `docker-compose port mariadb 3306`
+    environment:
+      << : *default-environment
+
+networks:
+  amazeeio-network:
+    external: true
