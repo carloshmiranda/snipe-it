@@ -1,6 +1,7 @@
 .couscous
 .DS_Store
 .idea
+.env
 /bin/
 /bootstrap/compiled.php
 /node_modules
