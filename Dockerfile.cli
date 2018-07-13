@@ -4,5 +4,6 @@ COPY composer.json composer.lock /app/
 RUN composer install --no-dev --prefer-dist
 
 COPY . /app
-ENV WEBROOT=app
+ENV WEBROOT=public
+ENV APP_DEBUG=true
 ENV PAGER=less
