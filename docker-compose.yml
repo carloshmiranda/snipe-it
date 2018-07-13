@@ -34,8 +34,6 @@ services:
       << : *default-environment # loads the defined environment variables from the top
     depends_on:
       - mariadb
-    env_file:
-      - .env.production
 
   #artisan-worker: # worker container, used for executing artisan queue:work
   #  build:
@@ -83,8 +81,6 @@ services:
       - cli
     environment:
       << : *default-environment # loads the defined environment variables from the top
-    env_file:
-      - .env.production
 
   mariadb:
     image: amazeeio/mariadb
