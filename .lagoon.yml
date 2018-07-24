@@ -18,7 +18,7 @@ cronjobs:
      service: cli
 
 environments:
- prod:
+ dev-lagoon:
    routes:
      - nginx:
        - "snipeit.amazeelabs.com"
