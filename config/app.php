@@ -308,11 +308,11 @@ return [
         App\Providers\SettingsServiceProvider::class,
         App\Providers\ValidationServiceProvider::class,
 
-
         /*
         * Custom service provider
         */
         App\Providers\MacroServiceProvider::class,
+        App\Providers\LaragoonServiceProvider::class,
 
 
     ],
