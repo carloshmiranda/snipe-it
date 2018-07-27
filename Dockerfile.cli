@@ -5,7 +5,7 @@ COPY composer.json composer.lock /app/
 
 RUN composer install --no-dev --prefer-dist
 
-chown root:root storage/oauth-p*
+RUN chown root:root storage/oauth-p*
 
 COPY . /app
 ENV WEBROOT=public
