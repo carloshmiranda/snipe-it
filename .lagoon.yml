@@ -22,3 +22,5 @@ environments:
    routes:
      - nginx:
        - "snipeit.amazeelabs.com"
+           tls-acme: 'true'
+           insecure: Redirect
