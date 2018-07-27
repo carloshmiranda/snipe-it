@@ -1,5 +1,6 @@
 .git
 .dockerignore
+docker-compose.yml
 app/storage/logs/*
 app/storage/views/*
 vendor/*

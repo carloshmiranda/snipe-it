@@ -1,0 +1,24 @@
+docker-compose-yaml: docker-compose.yml
+
+project: snipeit
+endpoint: api-lagoon-master.lagoon.ch.amazee.io:31472
+api: api-lagoon-master.lagoon.ch.amazee.io:80
+
+tasks:
+  post-rollout:
+    - run:
+        name: Generate keys
+        command: php artisan passport:keys
+        service: cli
+
+cronjobs:
+   - name: cronjob
+     schedule: "*/1 * * * *"
+     command: cd /app && php artisan schedule:run
+     service: cli
+
+environments:
+ master:
+   routes:
+     - nginx:
+       - "snipeit.amazeelabs.com"

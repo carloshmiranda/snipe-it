@@ -224,7 +224,7 @@
                        @can('create', \App\Models\Component::class)
                        <li {!! (Request::is('components/create') ? 'class="active"' : '') !!}>
                            <a href="{{ route('components.create') }}">
-                           <i class="fa fa-hdd-o"></i>
+                           <i class="fa fa-hdd-o fa-fw"></i>
                            {{ trans('general.component') }}
                            </a>
                        </li>
@@ -310,7 +310,7 @@
 
                      <li {!! (Request::is('account/requested') ? ' class="active"' : '') !!}>
                          <a href="{{ route('account.requested') }}">
-                             <i class="fa fa-check fa-disk"></i>
+                             <i class="fa fa-check fa-disk fa-fw"></i>
                              Requested Assets
                          </a></li>
 
@@ -534,13 +534,13 @@
                     </a>
 
                     <ul class="treeview-menu">
-                        @can('view', \App\Models\CustomField::class)
+                        @if(Gate::allows('view', App\Models\CustomField::class) || Gate::allows('view', App\Models\CustomFieldset::class))
                             <li {!! (Request::is('fields*') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('fields.index') }}">
                                     {{ trans('admin/custom_fields/general.custom_fields') }}
                                 </a>
                             </li>
-                        @endcan
+                        @endif
 
                         @can('view', \App\Models\Statuslabel::class)
                             <li {!! (Request::is('statuslabels*') ? ' class="active"' : '') !!}>
