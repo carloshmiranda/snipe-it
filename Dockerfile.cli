@@ -2,13 +2,8 @@ FROM amazeeio/php:7.1-cli
 
 COPY composer.json composer.lock /app/
 
-<<<<<<< HEAD
-=======
 RUN composer install --no-dev --prefer-dist
 
-RUN chown root:root storage/oauth-p*
-
->>>>>>> 49be7508354f5ed913bc12c65f86a3e727057dd1
 COPY . /app
 ENV WEBROOT=public
 ENV PAGER=less
