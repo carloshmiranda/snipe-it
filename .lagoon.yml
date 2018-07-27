@@ -7,8 +7,8 @@ api: api-lagoon-master.lagoon.ch.amazee.io:80
 tasks:
   post-rollout:
     - run:
-        name: Run migrations
-        command: php artisan migrate
+        name: Generate keys
+        command: php artisan passport:keys
         service: cli
 
 cronjobs:
