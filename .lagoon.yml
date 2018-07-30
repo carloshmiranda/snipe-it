@@ -10,7 +10,7 @@ tasks:
         name: Run migrations
         command: php artisan migrate
         service: cli
-    - run:    
+    - run:
         name: Generate keys
         command: php artisan passport:keys
         service: cli
@@ -25,6 +25,6 @@ environments:
  master:
    routes:
      - nginx:
-       - "snipeit.amazeelabs.com"
-           tls-acme: 'true'
-           insecure: Redirect
+       - "snipeit.amazeelabs.com":
+         tls-acme: 'true'
+         insecure: Redirect
