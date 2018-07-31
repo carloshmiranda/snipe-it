@@ -25,6 +25,6 @@ environments:
  master:
    routes:
      - nginx:
-       - "snipeit.amazeelabs.com":
+       - "snipeit.amazeelabs.com"
          tls-acme: 'true'
          insecure: Redirect
