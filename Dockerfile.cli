@@ -3,11 +3,7 @@ FROM amazeeio/php:7.1-cli
 COPY composer.json composer.lock /app/
 
 RUN composer install --no-dev --prefer-dist
-<<<<<<< HEAD
-RUN docker-php-ext-install gd 
-=======
-RUN docker-php-ext-install pcntl 
->>>>>>> b2f0264ceb7beb4ae552b63f184e8dff30c0ca07
+RUN docker-php-ext-install gd
 
 COPY . /app
 ENV WEBROOT=public
