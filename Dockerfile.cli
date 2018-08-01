@@ -6,5 +6,5 @@ RUN composer install --no-dev --prefer-dist
 RUN docker-php-ext-install gd
 
 COPY . /app
-ENV WEBROOT=public
-ENV PAGER=less
+#ENV WEBROOT=public
+#ENV PAGER=less
