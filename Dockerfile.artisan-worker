@@ -1,8 +1,0 @@
-FROM amazeeio/php:7.1-cli
-COPY composer.json composer.lock /app/
-RUN composer install --no-dev --prefer-dist
-COPY . /app
-ENV WEBROOT=public
-ENV PAGER=less
-ENV PHP_MEMORY_LIMIT=512M
-ENTRYPOINT ["/app/scripts/worker.sh"]
