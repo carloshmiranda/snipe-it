@@ -1,4 +1,4 @@
-FROM amazeeio/php:7.0-cli
+FROM amazeeio/php:7.1-cli
 
 COPY composer.json composer.lock /app/
 
