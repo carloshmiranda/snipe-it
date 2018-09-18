@@ -9,4 +9,4 @@ ENV APP_ENV=${LAGOON_ENVIRONMENT_TYPE}
 ENV WEBROOT=public
 ENV PAGER=less
 ENV PHP_MEMORY_LIMIT=8192M
-CMD ["/app/scripts/entrypoint.sh"]
+CMD ["/app/scripts/worker.sh"]
