@@ -24,26 +24,26 @@ fi
 
 # create data directories
 for dir in \
-  'data/private_uploads' \
-  'data/uploads/accessories' \
-  'data/uploads/avatars' \
-  'data/uploads/barcodes' \
-  'data/uploads/categories' \
-  'data/uploads/companies' \
-  'data/uploads/components' \
-  'data/uploads/consumables' \
-  'data/uploads/departments' \
-  'data/uploads/locations' \
-  'data/uploads/manufacturers' \
-  'data/uploads/models' \
-  'data/uploads/suppliers' \
+  'public/private_uploads' \
+  'public/uploads/accessories' \
+  'public/uploads/avatars' \
+  'public/uploads/barcodes' \
+  'public/uploads/categories' \
+  'public/uploads/companies' \
+  'public/uploads/components' \
+  'public/uploads/consumables' \
+  'public/uploads/departments' \
+  'public/uploads/locations' \
+  'public/uploads/manufacturers' \
+  'public/uploads/models' \
+  'public/uploads/suppliers' \
   'dumps' \
   'keys'
 do
   [ ! -d "/app/$dir" ] && mkdir -p "/app/$dir"
 done
 
-chown -R root:root /app/data/*
+chown -R root:root /app/public/*
 chown -R root:root /app/dumps
 chown -R root:root /app/keys
 
