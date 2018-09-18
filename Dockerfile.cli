@@ -4,7 +4,7 @@ COPY .lagoon/php-cli.ini /usr/local/etc/php/php.ini
 COPY composer.json composer.lock /app/
 
 RUN composer install --no-dev --prefer-dist
-RUN chown www-data:www-data /app/storage/oauth-*.key
+
 #RUN docker-php-ext-install gd
 
 COPY . /app
