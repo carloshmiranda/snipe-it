@@ -8,4 +8,5 @@ RUN composer install --no-dev --prefer-dist
 #RUN docker-php-ext-install gd
 
 COPY . /app
+ENV APP_ENV=${LAGOON_ENVIRONMENT_TYPE}
 ENV WEBROOT=public
