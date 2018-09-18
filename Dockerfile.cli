@@ -10,3 +10,4 @@ RUN composer install --no-dev --prefer-dist
 COPY . /app
 ENV APP_ENV=${LAGOON_ENVIRONMENT_TYPE}
 ENV WEBROOT=public
+CMD ["/app/scripts/entrypoint.sh"]
