@@ -43,9 +43,9 @@ do
   [ ! -d "/app/$dir" ] && mkdir -p "/app/$dir"
 done
 
-chown -R docker:root /app/data/*
-chown -R docker:root /app/dumps
-chown -R docker:root /app/keys
+chown -R root:root /app/data/*
+chown -R root:root /app/dumps
+chown -R root:root /app/keys
 
 # If the Oauth DB files are not present copy the vendor files over to the db migrations
 if [ ! -f "/app/database/migrations/*create_oauth*" ]
