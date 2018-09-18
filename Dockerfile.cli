@@ -1,10 +1,12 @@
 FROM amazeeio/php:7.1-cli
 
 COPY .lagoon/php-cli.ini /usr/local/etc/php/php.ini
-COPY composer.json composer.lock /app/
+COPY . /app/
 
 RUN composer install --no-dev --prefer-dist
+
 #RUN docker-php-ext-install gd
 
 COPY . /app
+ENV APP_ENV=${LAGOON_ENVIRONMENT_TYPE}
 ENV WEBROOT=public

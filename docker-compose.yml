@@ -35,20 +35,20 @@ services:
     depends_on:
       - mariadb
 
-  #artisan-worker: # worker container, used for executing artisan queue:work
-  #  build:
-  #    context: .
-  #    dockerfile: Dockerfile.artisan-worker
-  #  labels:
-  #    # Lagoon Labels
-  #    lagoon.type: cli
-  #  << : *default-volumes # loads the defined volumes from the top
-  #  volumes_from: # mount the ssh-agent from the pygmy or cachalot ssh-agent
-  #    - container:amazeeio-ssh-agent
-  #  environment:
-  #    << : *default-environment # loads the defined environment variables from the top
-  #  depends_on:
-  #    - mariadb
+#  artisan-worker: # worker container, used for executing artisan queue:work
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.artisan-worker
+#    labels:
+#      # Lagoon Labels
+#      lagoon.type: cli
+#    << : *default-volumes # loads the defined volumes from the top
+#    volumes_from: # mount the ssh-agent from the pygmy or cachalot ssh-agent
+#      - container:amazeeio-ssh-agent
+#    environment:
+#      << : *default-environment # loads the defined environment variables from the top
+#    depends_on:
+#      - mariadb
 
   nginx:
     build:

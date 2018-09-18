@@ -9,12 +9,12 @@ then
   exit
 fi
 
-if [ -f /var/lib/snipeit/ssl/snipeit-ssl.crt -a -f /var/lib/snipeit/ssl/snipeit-ssl.key ]
-then
-  a2enmod ssl
-else
-  a2dismod ssl
-fi
+#if [ -f /var/lib/snipeit/ssl/snipeit-ssl.crt -a -f /var/lib/snipeit/ssl/snipeit-ssl.key ]
+#then
+#  a2enmod ssl
+#else
+#  a2dismod ssl
+#fi
 
 # create data directories
 for dir in \
@@ -34,18 +34,18 @@ for dir in \
   'dumps' \
   'keys'
 do
-  [ ! -d "/var/lib/snipeit/$dir" ] && mkdir -p "/var/lib/snipeit/$dir"
+  [ ! -d "/app/$dir" ] && mkdir -p "/app/$dir"
 done
 
-chown -R docker:root /var/lib/snipeit/data/*
-chown -R docker:root /var/lib/snipeit/dumps
-chown -R docker:root /var/lib/snipeit/keys
+chown -R docker:root /app/data/*
+chown -R docker:root /app/dumps
+chown -R docker:root /app/keys
 
 # If the Oauth DB files are not present copy the vendor files over to the db migrations
-if [ ! -f "/var/www/html/database/migrations/*create_oauth*" ]
+if [ ! -f "/app/database/migrations/*create_oauth*" ]
 then
-  cp -ax /var/www/html/vendor/laravel/passport/database/migrations/* /var/www/html/database/migrations/
+  cp -ax /app/vendor/laravel/passport/database/migrations/* /app/database/migrations/
 fi
 
-. /etc/apache2/envvars 
-exec apache2 -DNO_DETACH < /dev/null
+#. /etc/apache2/envvars
+#exec apache2 -DNO_DETACH < /dev/null
