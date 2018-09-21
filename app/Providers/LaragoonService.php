@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Laragoon;
+namespace App\Providers;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
