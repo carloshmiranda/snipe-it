@@ -42,7 +42,7 @@ class SendExpectedCheckinAlerts extends Command
      *
      * @return mixed
      */
-    public function fire()
+    public function handle()
     {
         $settings = Setting::getSettings();
         $whenNotify = Carbon::now()->addDays(7);
@@ -57,17 +57,12 @@ class SendExpectedCheckinAlerts extends Command
             }
         }
 
-
         // Send a rollup to the admin, if settings dictate
         $recipient = new \App\Models\Recipients\AlertRecipient();
 
-        if (($assets) && ($assets->count() > 0) && ($settings->alert_email!='')) {
+        if (($assets) && ($assets->count() > 0) && ($settings->alerts_enabled && $settings->alert_email != '')) {
             $recipient->notify(new ExpectedCheckinAdminNotification($assets));
         }
-
-
-
-
 
     }
 }

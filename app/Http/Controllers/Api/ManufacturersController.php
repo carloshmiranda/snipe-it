@@ -26,13 +26,13 @@ class ManufacturersController extends Controller
 
         $manufacturers = Manufacturer::select(
             array('id','name','url','support_url','support_email','support_phone','created_at','updated_at','image', 'deleted_at')
-        )->withCount('assets')->withCount('licenses')->withCount('consumables')->withCount('accessories');
+        )->withCount('assets as assets_count')->withCount('licenses as licenses_count')->withCount('consumables as consumables_count')->withCount('accessories as accessories_count');
 
         if ($request->input('deleted')=='true') {
             $manufacturers->onlyTrashed();
         }
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $manufacturers = $manufacturers->TextSearch($request->input('search'));
         }
 
@@ -83,7 +83,7 @@ class ManufacturersController extends Controller
     public function show($id)
     {
         $this->authorize('view', Manufacturer::class);
-        $manufacturer = Manufacturer::findOrFail($id);
+        $manufacturer = Manufacturer::withCount('assets as assets_count', 'licenses as licenses_count', 'consumables as consumables_count', 'accessories as accessories_count', 'models as models_count'  )->findOrFail($id);
         return (new ManufacturersTransformer)->transformManufacturer($manufacturer);
     }
 
@@ -120,11 +120,21 @@ class ManufacturersController extends Controller
      */
     public function destroy($id)
     {
+
         $this->authorize('delete', Manufacturer::class);
-        $manufacturer = Manufacturer::findOrFail($id);
+        $manufacturer = Manufacturer::withCount('assets as assets_count', 'licenses as licenses_count', 'consumables as consumables_count', 'accessories as accessories_count', 'models as models_count'  )->findOrFail($id);
         $this->authorize('delete', $manufacturer);
-        $manufacturer->delete();
-        return response()->json(Helper::formatStandardApiResponse('success', null,  trans('admin/manufacturers/message.delete.success')));
+
+        if (($manufacturer->assets_count == 0)  && ($manufacturer->licenses_count==0)  && ($manufacturer->consumables_count==0)  && ($manufacturer->accessories_count==0)  && ($manufacturer->models_count==0)  && ($manufacturer->deleted_at=='')) {
+            $manufacturer->delete();
+            return response()->json(Helper::formatStandardApiResponse('success', null,  trans('admin/manufacturers/message.delete.success')));
+        }
+
+        return response()->json(Helper::formatStandardApiResponse('error', null,  trans('admin/manufacturers/message.delete.error')));
+
+
+
+
 
     }
 
@@ -145,7 +155,7 @@ class ManufacturersController extends Controller
             'image',
         ]);
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $manufacturers = $manufacturers->where('name', 'LIKE', '%'.$request->get('search').'%');
         }
 

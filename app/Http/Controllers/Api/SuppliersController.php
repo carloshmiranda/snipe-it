@@ -22,14 +22,14 @@ class SuppliersController extends Controller
     public function index(Request $request)
     {
         $this->authorize('view', Supplier::class);
-        $allowed_columns = ['id','name','address','phone','contact','fax','email','image','assets_count','licenses_count', 'accessories_count'];
+        $allowed_columns = ['id','name','address','phone','contact','fax','email','image','assets_count','licenses_count', 'accessories_count','url'];
         
         $suppliers = Supplier::select(
-                array('id','name','address','address2','city','state','country','fax', 'phone','email','contact','created_at','updated_at','deleted_at','image','notes')
-            )->withCount('assets')->withCount('licenses')->withCount('accessories');
+                array('id','name','address','address2','city','state','country','fax', 'phone','email','contact','created_at','updated_at','deleted_at','image','notes', 'url')
+            )->withCount('assets as assets_count')->withCount('licenses as licenses_count')->withCount('accessories as accessories_count');
 
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $suppliers = $suppliers->TextSearch($request->input('search'));
         }
 
@@ -115,7 +115,7 @@ class SuppliersController extends Controller
     public function destroy($id)
     {
         $this->authorize('delete', Supplier::class);
-        $supplier = Supplier::with('asset_maintenances', 'assets', 'licenses')->withCount('asset_maintenances','assets', 'licenses')->findOrFail($id);
+        $supplier = Supplier::with('asset_maintenances', 'assets', 'licenses')->withCount('asset_maintenances as asset_maintenances_count','assets as assets_count', 'licenses as licenses_count')->findOrFail($id);
         $this->authorize('delete', $supplier);
 
 
@@ -153,7 +153,7 @@ class SuppliersController extends Controller
             'image',
         ]);
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $suppliers = $suppliers->where('suppliers.name', 'LIKE', '%'.$request->get('search').'%');
         }
 
