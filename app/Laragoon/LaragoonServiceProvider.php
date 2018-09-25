@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Providers;
+namespace App\Laragoon;
 
 use Illuminate\Support\ServiceProvider;
-use App\Laragoon\LaragoonFacade;
+use Bryangruneberg\Laragoon\LaragoonFacade;
 
 class LaragoonServiceProvider extends ServiceProvider
 {
