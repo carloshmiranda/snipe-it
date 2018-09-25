@@ -3,7 +3,7 @@
 namespace App\Laragoon;
 
 use Illuminate\Support\ServiceProvider;
-use Bryangruneberg\Laragoon\LaragoonFacade;
+use App\Laragoon\LaragoonFacade;
 
 class LaragoonServiceProvider extends ServiceProvider
 {
