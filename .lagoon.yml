@@ -14,16 +14,10 @@ tasks:
         name: Run migrations
         command: php artisan migrate
         service: cli
-    - run:
-        name: Generate keys
-        command: php artisan passport:keys
-        service: cli
-
-cronjobs:
-   - name: cronjob
-     schedule: "*/1 * * * *"
-     command: cd /app && php artisan schedule:run
-     service: cli
+#    - run:
+#        name: Generate keys
+#        command: php artisan passport:keys
+#        service: cli
 
 environments:
  master:
