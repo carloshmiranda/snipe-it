@@ -51,3 +51,7 @@ tests/_support/_generated/*
 *.cache
 
 .vagrant
+
+\.php_cs\.dist
+
+phpmd\.xml
