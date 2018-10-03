@@ -27,7 +27,7 @@ services:
     image: *lagoon-project # this image will be reused as `CLI_IMAGE` in subsequent Docker builds
     labels:
       # Lagoon Labels
-      lagoon.type: cli-persistent
+      lagoon.type: nginx-php-persistent
       lagoon.persistent.name: nginx # mount the persistent storage of nginx into this container
       lagoon.persistent: /app/storage/framework # location where the persistent storage should be mounted
     << : *default-volumes # loads the defined volumes from the top
