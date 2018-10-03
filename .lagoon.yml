@@ -7,10 +7,6 @@ api: api-lagoon-master.lagoon.ch.amazee.io:80
 tasks:
   post-rollout:
     - run:
-        name: Run cache clear
-        command: php artisan config:clear
-        service: cli
-    - run:
         name: Run migrations
         command: php artisan migrate
         service: cli
