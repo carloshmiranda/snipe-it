@@ -28,7 +28,7 @@ services:
     labels:
       # Lagoon Labels
       lagoon.type: cli-persistent
-      lagoon.persistent.name: nginx # mount the persistent storage of nginx into this container
+      lagoon.name: nginx # mount the persistent storage of nginx into this container
       lagoon.persistent: /app/storage/framework # location where the persistent storage should be mounted
     << : *default-volumes # loads the defined volumes from the top
     volumes_from: # mount the ssh-agent from the pygmy or cachalot ssh-agent
@@ -77,7 +77,7 @@ services:
         CLI_IMAGE: *lagoon-project
     labels:
       lagoon.type: nginx-php-persistent
-      lagoon.persistent.name: nginx # we want this service be part of the nginx pod in Lagoon
+      lagoon.name: nginx # we want this service be part of the nginx pod in Lagoon
       lagoon.persistent: /app/storage/framework # define where the persistent storage should be mounted too
     << : *default-volumes # loads the defined volumes from the top
     depends_on:
