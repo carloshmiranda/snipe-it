@@ -6,7 +6,7 @@ x-lagoon-project:
 x-volumes:
   &default-volumes
     volumes:
-      - ./:/app:delegated
+      - .:/app:delegated
 
 x-environment:
   &default-environment
