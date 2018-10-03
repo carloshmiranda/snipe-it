@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
     "content-hash": "4794c83ea829d24a23b36eab688fb443",
-=======
-    "content-hash": "1b2d866e20b5d160ea9d055221d1fec4",
->>>>>>> upstream/develop
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -137,7 +133,6 @@
             "time": "2017-10-17T09:59:25+00:00"
         },
         {
-<<<<<<< HEAD
             "name": "barryvdh/laravel-debugbar",
             "version": "v3.2.0",
             "source": {
@@ -267,8 +262,6 @@
             "time": "2018-07-21T01:54:41+00:00"
         },
         {
-=======
->>>>>>> upstream/develop
             "name": "defuse/php-encryption",
             "version": "v2.2.1",
             "source": {
