@@ -55,3 +55,4 @@ tests/_support/_generated/*
 \.php_cs\.dist
 
 phpmd\.xml
+/public/storage
