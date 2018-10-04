@@ -10,6 +10,9 @@ COPY lagoon/nginx.conf /etc/nginx/conf.d/app.conf
 
 COPY --from=cli /app /app
 
+RUN chown -R root:root \
+  /app/storage
+
 ENV WEBROOT=public
 
 RUN ls  /etc/nginx/conf.d/
