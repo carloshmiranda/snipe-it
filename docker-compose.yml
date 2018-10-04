@@ -94,6 +94,13 @@ services:
     environment:
       << : *default-environment
 
+  redis:
+    image: amazeeio/redis
+    labels:
+      lagoon.type: redis
+    environment:
+      << : *default-environment      
+
 networks:
   amazeeio-network:
     external: true
