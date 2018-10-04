@@ -42,20 +42,20 @@ services:
     environment:
       << : *default-environment # loads the defined environment variables from the top
 
-  artisan-worker: # worker container, used for executing artisan queue:work
-    build:
-      context: .
-      dockerfile: Dockerfile.artisan-worker
-    labels:
-      # Lagoon Labels
-      lagoon.type: cli
-    << : *default-volumes # loads the defined volumes from the top
-    volumes_from: # mount the ssh-agent from the pygmy or cachalot ssh-agent
-      - container:amazeeio-ssh-agent
-    environment:
-      << : *default-environment # loads the defined environment variables from the top
-    depends_on:
-      - mariadb
+#artisan-worker: # worker container, used for executing artisan queue:work
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.artisan-worker
+#    labels:
+#      # Lagoon Labels
+#      lagoon.type: cli
+#    << : *default-volumes # loads the defined volumes from the top
+#    volumes_from: # mount the ssh-agent from the pygmy or cachalot ssh-agent
+#      - container:amazeeio-ssh-agent
+#    environment:
+#      << : *default-environment # loads the defined environment variables from the top
+#    depends_on:
+#      - mariadb
 
   nginx:
     build:
@@ -67,7 +67,7 @@ services:
       lagoon.type: nginx-php-persistent
       lagoon.persistent: /app/storage/ # define where the persistent storage should be mounted too
     << : *default-volumes # loads the defined volumes from the top
-    << : *default-user # uses the defined user from top
+    user: root
     depends_on:
       - cli
     environment:
@@ -87,7 +87,7 @@ services:
       lagoon.name: nginx # we want this service be part of the nginx pod in Lagoon
       lagoon.persistent: /app/storage/ # define where the persistent storage should be mounted too
     << : *default-volumes # loads the defined volumes from the top
-    << : *default-user # uses the defined user from top
+    user: root
     depends_on:
       - cli
     environment:
@@ -99,7 +99,7 @@ services:
       lagoon.type: mariadb
     ports:
       - "3306" # exposes the port 3306 with a random local port, find it with `docker-compose port mariadb 3306`
-    << : *default-user # uses the defined user from top
+    #user: root
     environment:
       << : *default-environment
 
@@ -107,7 +107,7 @@ services:
     image: amazeeio/redis
     labels:
       lagoon.type: redis
-    << : *default-user # uses the defined user from top
+    user: root
     environment:
       << : *default-environment
 
@@ -117,7 +117,7 @@ services:
       lagoon.type: varnish
     links:
       - nginx # links varnish to the nginx in this docker-compose project, or it would try to connect to any nginx running in docker
-    << : *default-user # uses the defined user from top
+    user: root
     environment:
       << : *default-environment
       VARNISH_BYPASS: "false" # by default we bypass varnish, change to 'false' or remove in order to tell varnish to cache if possible
