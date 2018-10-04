@@ -99,7 +99,20 @@ services:
     labels:
       lagoon.type: redis
     environment:
-      << : *default-environment      
+      << : *default-environment
+
+  varnish:
+    image: amazeeio/varnish-drupal
+    labels:
+      lagoon.type: varnish
+    links:
+      - nginx # links varnish to the nginx in this docker-compose project, or it would try to connect to any nginx running in docker
+    environment:
+      << : *default-environment
+      VARNISH_BYPASS: "false" # by default we bypass varnish, change to 'false' or remove in order to tell varnish to cache if possible
+    networks:
+      - amazeeio-network
+      - default
 
 networks:
   amazeeio-network:

@@ -1,6 +1,9 @@
 .git
 .dockerignore
 docker-compose.yml
-app/storage/logs/*
-app/storage/views/*
+storage/logs/*
+storage/views/*
 vendor/*
+storage/framework/cache/**
+storage/framework/sessions/**
+storage/framework/views/**
