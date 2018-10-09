@@ -95,13 +95,6 @@ services:
     environment:
       << : *default-environment
 
-  redis:
-    image: amazeeio/redis
-    labels:
-      lagoon.type: redis
-    environment:
-      << : *default-environment
-
   varnish:
     image: amazeeio/varnish-drupal
     labels:
