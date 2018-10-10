@@ -4,11 +4,13 @@
 
 FROM amazeeio/php:7.1-cli
 COPY lagoon/php-cli.ini /usr/local/etc/php/php.ini
-COPY . /app
+COPY composer.json /app
+
 RUN composer install --no-dev --prefer-dist
+
+COPY . /app
 
 ENV APP_ENV=${LAGOON_ENVIRONMENT_TYPE}
 ENV WEBROOT=public
 ENV PAGER=less
 ENV PHP_MEMORY_LIMIT=8192M
-
