@@ -9,3 +9,5 @@ FROM amazeeio/php:7.1-fpm
 
 ENV APP_ENV=${LAGOON_ENVIRONMENT_TYPE}
 COPY --from=cli /app /app
+RUN chown -R root:root /app/storage
+RUN chmod 777 storage/ storage/*
