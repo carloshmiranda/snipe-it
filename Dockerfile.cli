@@ -9,6 +9,7 @@ COPY . /app
 RUN composer install --no-dev --prefer-dist
 
 COPY . /app
+RUN chown -R root:root /app/storage
 
 ENV APP_ENV=${LAGOON_ENVIRONMENT_TYPE}
 ENV WEBROOT=public
