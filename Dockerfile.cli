@@ -6,6 +6,7 @@ FROM amazeeio/php:7.1-cli
 COPY lagoon/php-cli.ini /usr/local/etc/php/php.ini
 COPY . /app
 RUN chown -R root:root /app/storage
+RUN chmod 777 storage/ storage/*
 RUN composer install --no-dev --prefer-dist
 
 COPY . /app
