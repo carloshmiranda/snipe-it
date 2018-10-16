@@ -1,0 +1,43 @@
+{
+    "name": "eduardokum/laravel-mail-auto-embed",
+    "description": "Library for embed images in emails automatically",
+    "keywords": [
+        "eduardokum",
+        "laravel-mail-auto-embed"
+    ],
+    "homepage": "https://github.com/eduardokum/laravel-mail-auto-embed",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eduardo Gusmão",
+            "email": "eduguscontra3@hotmail.com"
+        }
+    ],
+    "require": {
+        "php" : ">=5.5.0",
+        "illuminate/contracts": ">=5.3",
+        "illuminate/support": ">=5.3",
+        "illuminate/mail": ">=5.3"
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.0",
+        "phpunit/phpunit": "~5.0|~6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Eduardokum\\LaravelMailAutoEmbed\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Eduardokum\\LaravelMailAutoEmbed\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Eduardokum\\LaravelMailAutoEmbed\\ServiceProvider"
+            ]
+        }
+    }
+}
