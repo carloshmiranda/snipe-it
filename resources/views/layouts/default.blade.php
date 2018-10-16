@@ -88,7 +88,7 @@
         <!-- Header Navbar: style can be found in header.less -->
         <nav class="navbar navbar-static-top" role="navigation">
           <!-- Sidebar toggle button above the compact sidenav -->
-          <a href="#" style="color: white" class="sidebar-toggle btn btn-white" data-toggle="offcanvas" role="button">
+          <a href="#" style="color: white" class="sidebar-toggle btn btn-white" data-toggle="push-menu" role="button">
             <span class="sr-only">Toggle navigation</span>
           </a>
           <ul class="nav navbar-nav navbar-left">
@@ -96,14 +96,14 @@
                  @if ($snipeSettings->brand == '3')
                       <a class="logo navbar-brand no-hover" href="{{ url('/') }}">
                           @if ($snipeSettings->logo!='')
-                          <img class="navbar-brand-img" src="{{ Storage::disk('public')->url('').e($snipeSettings->logo) }}">
+                          <img class="navbar-brand-img" src="{{ Storage::disk('public')->url('').e($snipeSettings->logo) }}" alt="{{ $snipeSettings->site_name }} logo">
                           @endif
                           {{ $snipeSettings->site_name }}
                       </a>
                   @elseif ($snipeSettings->brand == '2')
                       <a class="logo navbar-brand no-hover" href="{{ url('/') }}">
                           @if ($snipeSettings->logo!='')
-                            <img class="navbar-brand-img" src="{{ Storage::disk('public')->url('').e($snipeSettings->logo) }}">
+                            <img class="navbar-brand-img" src="{{ Storage::disk('public')->url('').e($snipeSettings->logo) }}" alt="{{ $snipeSettings->site_name }} logo">
                           @endif
                       </a>
                   @else
@@ -350,7 +350,7 @@
             </ul>
           </div>
       </nav>
-       <a href="#" style="float:left" class="sidebar-toggle-mobile visible-xs btn" data-toggle="offcanvas" role="button">
+       <a href="#" style="float:left" class="sidebar-toggle-mobile visible-xs btn" data-toggle="push-menu" role="button">
         <span class="sr-only">Toggle navigation</span>
         <i class="fa fa-bars"></i>
       </a>
@@ -362,7 +362,7 @@
         <!-- sidebar: style can be found in sidebar.less -->
         <section class="sidebar">
           <!-- sidebar menu: : style can be found in sidebar.less -->
-          <ul class="sidebar-menu">
+          <ul class="sidebar-menu" data-widget="tree">
             @can('admin')
             <li {!! (\Request::route()->getName()=='home' ? ' class="active"' : '') !!}>
               <a href="{{ route('home') }}">
@@ -754,8 +754,7 @@
                   {!!  Parsedown::instance()->text(e($snipeSettings->footer_text))  !!}
               </div>
           @endif
-
-
+          
         <a target="_blank" href="https://snipeitapp.com" rel="noopener">Snipe-IT</a> is open source software, made with <i class="fa fa-heart" style="color: #a94442; font-size: 10px"></i> by <a href="https://twitter.com/snipeitapp" rel="noopener">@snipeitapp</a>.
       </footer>
 
@@ -797,7 +796,15 @@
     @show
 
     <script nonce="{{ csrf_token() }}">
+        $.validate({
+            form : '#create-form',
+            modules : 'date, toggleDisabled',
+            disabledFormFilter : '#create-form',
+            showErrorDialogs : true
+        });
+
         $(function () {
+  
             $('[data-toggle="tooltip"]').tooltip();
             $('[data-toggle="popover"]').popover();
             $('.select2 span').addClass('needsclick');
