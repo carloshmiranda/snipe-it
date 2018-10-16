@@ -31,7 +31,7 @@ return [
     |
     */
 
-    'driver' => env('MAIL_DRIVER', 'smtp'),
+    'driver' => env('MAIL_DRIVER', 'mail'),
 
     /*
     |--------------------------------------------------------------------------
@@ -84,7 +84,7 @@ return [
     |
     | You may wish for all e-mails sent by your application to have a different "Reply-to"
     | address than the "From" address. If this is left blank, the application will use
-    | your MAIL_FROM information. 
+    | your MAIL_FROM information.
     |
     */
 
