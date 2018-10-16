@@ -146,6 +146,7 @@ class ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb
         'J' => 
         array (
             'JmesPath\\' => 9,
+            'JakubOnderka\\PhpConsoleHighlighter\\' => 35,
             'JakubOnderka\\PhpConsoleColor\\' => 29,
         ),
         'I' => 
@@ -473,6 +474,10 @@ class ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb
         array (
             0 => __DIR__ . '/..' . '/mtdowling/jmespath.php/src',
         ),
+        'JakubOnderka\\PhpConsoleHighlighter\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jakub-onderka/php-console-highlighter/src',
+        ),
         'JakubOnderka\\PhpConsoleColor\\' => 
         array (
             0 => __DIR__ . '/..' . '/jakub-onderka/php-console-color/src',
@@ -639,13 +644,6 @@ class ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb
             'OpenCloud' => 
             array (
                 0 => __DIR__ . '/..' . '/rackspace/php-opencloud/lib',
-            ),
-        ),
-        'J' => 
-        array (
-            'JakubOnderka\\PhpConsoleHighlighter' => 
-            array (
-                0 => __DIR__ . '/..' . '/jakub-onderka/php-console-highlighter/src',
             ),
         ),
         'G' => 
@@ -1027,6 +1025,12 @@ class ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb
         'App\\Importer\\LicenseImporter' => __DIR__ . '/../..' . '/app/Importer/LicenseImporter.php',
         'App\\Importer\\UserImporter' => __DIR__ . '/../..' . '/app/Importer/UserImporter.php',
         'App\\Jobs\\Job' => __DIR__ . '/../..' . '/app/Jobs/Job.php',
+        'App\\Laragoon\\LaragoonDbConfigCommand' => __DIR__ . '/../..' . '/app/Laragoon/LaragoonDbConfigCommand.php',
+        'App\\Laragoon\\LaragoonException' => __DIR__ . '/../..' . '/app/Laragoon/LaragoonException.php',
+        'App\\Laragoon\\LaragoonFacade' => __DIR__ . '/../..' . '/app/Laragoon/LaragoonFacade.php',
+        'App\\Laragoon\\LaragoonService' => __DIR__ . '/../..' . '/app/Laragoon/LaragoonService.php',
+        'App\\Laragoon\\LaragoonServiceProvider' => __DIR__ . '/../..' . '/app/Laragoon/LaragoonServiceProvider.php',
+        'App\\Laragoon\\LaragoonSetProjectNameCommand' => __DIR__ . '/../..' . '/app/Laragoon/LaragoonSetProjectNameCommand.php',
         'App\\LegacyEncrypter\\BaseEncrypter' => __DIR__ . '/../..' . '/app/LegacyEncrypter/BaseEncrypter.php',
         'App\\LegacyEncrypter\\McryptEncrypter' => __DIR__ . '/../..' . '/app/LegacyEncrypter/McryptEncrypter.php',
         'App\\Listeners\\CheckoutableListener' => __DIR__ . '/../..' . '/app/Listeners/CheckoutableListener.php',
@@ -4740,7 +4744,7 @@ class ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb
         'Intervention\\Image\\Size' => __DIR__ . '/..' . '/intervention/image/src/Intervention/Image/Size.php',
         'JakubOnderka\\PhpConsoleColor\\ConsoleColor' => __DIR__ . '/..' . '/jakub-onderka/php-console-color/src/ConsoleColor.php',
         'JakubOnderka\\PhpConsoleColor\\InvalidStyleException' => __DIR__ . '/..' . '/jakub-onderka/php-console-color/src/InvalidStyleException.php',
-        'JakubOnderka\\PhpConsoleHighlighter\\Highlighter' => __DIR__ . '/..' . '/jakub-onderka/php-console-highlighter/src/JakubOnderka/PhpConsoleHighlighter/Highlighter.php',
+        'JakubOnderka\\PhpConsoleHighlighter\\Highlighter' => __DIR__ . '/..' . '/jakub-onderka/php-console-highlighter/src/Highlighter.php',
         'JmesPath\\AstRuntime' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/AstRuntime.php',
         'JmesPath\\CompilerRuntime' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/CompilerRuntime.php',
         'JmesPath\\DebugRuntime' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/DebugRuntime.php',
