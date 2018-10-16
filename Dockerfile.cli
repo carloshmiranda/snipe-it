@@ -7,6 +7,7 @@ COPY lagoon/php-cli.ini /usr/local/etc/php/php.ini
 
 COPY . /app
 
+RUN mkdir /app/storage/framework/*
 RUN mkdir /app/storage/framework/cache/
 RUN mkdir /app/storage/framework/sessions/
 RUN mkdir /app/storage/framework/views/
