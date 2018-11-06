@@ -15,6 +15,7 @@ COPY . /app
 RUN composer install --no-dev --prefer-dist
 
 ENV APP_ENV=${LAGOON_ENVIRONMENT_TYPE}
+ENV APP_DEBUG=TRUE
 ENV WEBROOT=public
 ENV PAGER=less
 ENV PHP_MEMORY_LIMIT=8192M
