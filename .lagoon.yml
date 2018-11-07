@@ -16,7 +16,7 @@ tasks:
         service: cli
 
 environments:
- prod:
+ master:
    routes:
      - nginx:
        - "https://snipeit.amazeelabs.com"
