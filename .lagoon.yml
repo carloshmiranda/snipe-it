@@ -11,15 +11,15 @@ api: api-lagoon-master.lagoon.ch.amazee.io:80
 tasks:
   post-rollout:
     - run:
-        name: Run migrations 
+        name: Run migrations
         command: php artisan migrate
         service: cli
 
 environments:
  prod:
-#   routes:
-#     - nginx:
-#       - "some.live.domain.example"
+   routes:
+     - nginx:
+       - "https://snipeit.amazee.com"
    cronjobs:
      - name: artisan schedule
        schedule: "* * * * *"
