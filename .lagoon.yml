@@ -19,7 +19,7 @@ environments:
  prod:
    routes:
      - nginx:
-       - "https://snipeit.amazee.com"
+       - "https://snipeit.amazeelabs.com"
    cronjobs:
      - name: artisan schedule
        schedule: "* * * * *"
