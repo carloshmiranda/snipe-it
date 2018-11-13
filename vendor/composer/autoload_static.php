@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb
+class ComposerStaticInitf4f8f8cee0d2fbab2d596c4e3d5774a3
 {
     public static $files = array (
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
@@ -886,6 +886,7 @@ class ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb
         'App\\Events\\CheckoutableCheckedIn' => __DIR__ . '/../..' . '/app/Events/CheckoutableCheckedIn.php',
         'App\\Events\\CheckoutableCheckedOut' => __DIR__ . '/../..' . '/app/Events/CheckoutableCheckedOut.php',
         'App\\Events\\Event' => __DIR__ . '/../..' . '/app/Events/Event.php',
+        'App\\Events\\SettingSaved' => __DIR__ . '/../..' . '/app/Events/SettingSaved.php',
         'App\\Exceptions\\CheckoutNotAllowed' => __DIR__ . '/../..' . '/app/Exceptions/CheckoutNotAllowed.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Helpers\\Helper' => __DIR__ . '/../..' . '/app/Helpers/Helper.php',
@@ -1491,6 +1492,8 @@ class ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb
         'Aws\\PI\\Exception\\PIException' => __DIR__ . '/..' . '/aws/aws-sdk-php/src/PI/Exception/PIException.php',
         'Aws\\PI\\PIClient' => __DIR__ . '/..' . '/aws/aws-sdk-php/src/PI/PIClient.php',
         'Aws\\PhpHash' => __DIR__ . '/..' . '/aws/aws-sdk-php/src/PhpHash.php',
+        'Aws\\PinpointEmail\\Exception\\PinpointEmailException' => __DIR__ . '/..' . '/aws/aws-sdk-php/src/PinpointEmail/Exception/PinpointEmailException.php',
+        'Aws\\PinpointEmail\\PinpointEmailClient' => __DIR__ . '/..' . '/aws/aws-sdk-php/src/PinpointEmail/PinpointEmailClient.php',
         'Aws\\Pinpoint\\Exception\\PinpointException' => __DIR__ . '/..' . '/aws/aws-sdk-php/src/Pinpoint/Exception/PinpointException.php',
         'Aws\\Pinpoint\\PinpointClient' => __DIR__ . '/..' . '/aws/aws-sdk-php/src/Pinpoint/PinpointClient.php',
         'Aws\\Polly\\Exception\\PollyException' => __DIR__ . '/..' . '/aws/aws-sdk-php/src/Polly/Exception/PollyException.php',
@@ -7741,11 +7744,11 @@ class ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb::$prefixDirsPsr4;
-            $loader->fallbackDirsPsr4 = ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb::$fallbackDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit6ea9df8eb9526dbbb27f9f3c034c83eb::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitf4f8f8cee0d2fbab2d596c4e3d5774a3::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitf4f8f8cee0d2fbab2d596c4e3d5774a3::$prefixDirsPsr4;
+            $loader->fallbackDirsPsr4 = ComposerStaticInitf4f8f8cee0d2fbab2d596c4e3d5774a3::$fallbackDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitf4f8f8cee0d2fbab2d596c4e3d5774a3::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitf4f8f8cee0d2fbab2d596c4e3d5774a3::$classMap;
 
         }, null, ClassLoader::class);
     }
