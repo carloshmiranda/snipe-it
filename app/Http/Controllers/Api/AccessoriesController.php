@@ -24,25 +24,25 @@ class AccessoriesController extends Controller
         $this->authorize('view', Accessory::class);
         $allowed_columns = ['id','name','model_number','eol','notes','created_at','min_amt','company_id'];
 
-        $accessories = Accessory::whereNull('accessories.deleted_at')->with('category', 'company', 'manufacturer', 'users', 'location');
+        $accessories = Accessory::with('category', 'company', 'manufacturer', 'users', 'location');
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $accessories = $accessories->TextSearch($request->input('search'));
         }
 
-        if ($request->has('company_id')) {
+        if ($request->filled('company_id')) {
             $accessories->where('company_id','=',$request->input('company_id'));
         }
 
-        if ($request->has('category_id')) {
+        if ($request->filled('category_id')) {
             $accessories->where('category_id','=',$request->input('category_id'));
         }
 
-        if ($request->has('manufacturer_id')) {
+        if ($request->filled('manufacturer_id')) {
             $accessories->where('manufacturer_id','=',$request->input('manufacturer_id'));
         }
 
-        if ($request->has('supplier_id')) {
+        if ($request->filled('supplier_id')) {
             $accessories->where('supplier_id','=',$request->input('supplier_id'));
         }
 
@@ -132,18 +132,28 @@ class AccessoriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function checkedout($id)
+    public function checkedout($id, Request $request)
     {
         $this->authorize('view', Accessory::class);
 
-        $accessory = Accessory::findOrFail($id);
+        $accessory = Accessory::with('lastCheckout')->findOrFail($id);
         if (!Company::isCurrentUserHasAccess($accessory)) {
             return ['total' => 0, 'rows' => []];
         }
-        $accessory_users = $accessory->users;
-        $total = $accessory_users->count();
 
-        return (new AccessoriesTransformer)->transformCheckedoutAccessory($accessory_users, $total);
+        $accessory->lastCheckoutArray = $accessory->lastCheckout->toArray();
+        $accessory_users = $accessory->users;
+        
+        if ($request->filled('search')) {
+            $accessory_users = $accessory->users()
+                                ->where('first_name', 'like', '%'.$request->input('search').'%')
+                                ->orWhere('last_name', 'like', '%'.$request->input('search').'%')
+                                ->get();
+        }
+
+        $total = $accessory_users->count();
+    
+        return (new AccessoriesTransformer)->transformCheckedoutAccessory($accessory, $accessory_users, $total);
     }
 
 

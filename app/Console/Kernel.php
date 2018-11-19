@@ -30,6 +30,9 @@ class Kernel extends ConsoleKernel
         Commands\SyncAssetLocations::class,
         Commands\RegenerateAssetTags::class,
         Commands\SyncAssetCounters::class,
+        Commands\RestoreDeletedUsers::class,
+        Commands\SendCurrentInventoryToUsers::class,
+        Commands\MoveUploadsToNewDisk::class,
     ];
 
     /**
@@ -48,6 +51,12 @@ class Kernel extends ConsoleKernel
         $schedule->command('backup:clean')->daily();
     }
 
+    /**
+     * This method is required by Laravel to handle any console routes
+     * that are defined in routes/console.php
+     *
+     * @return void
+     */
     protected function commands()
     {
         require base_path('routes/console.php');

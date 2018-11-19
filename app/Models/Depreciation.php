@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Models\Traits\Searchable;
 use App\Presenters\Presentable;
 use Watson\Validating\ValidatingTrait;
 
@@ -31,33 +32,44 @@ class Depreciation extends SnipeModel
      */
     protected $fillable = ['name','months'];
 
+    use Searchable;
+    
+    /**
+     * The attributes that should be included when searching the model.
+     * 
+     * @var array
+     */
+    protected $searchableAttributes = ['name', 'months'];
 
+    /**
+     * The relations and their attributes that should be included when searching the model.
+     * 
+     * @var array
+     */
+    protected $searchableRelations = [];
 
-    public function has_models()
+    /**
+     * Establishes the depreciation -> models relationship
+     *
+     * @author A. Gianotto <snipe@snipe.net>
+     * @since [v5.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
+    public function models()
     {
-        return $this->hasMany('\App\Models\AssetModel', 'depreciation_id')->count();
+        return $this->hasMany('\App\Models\AssetModel', 'depreciation_id');
     }
 
-    public function has_licenses()
+
+    /**
+     * Establishes the depreciation -> licenses relationship
+     *
+     * @author A. Gianotto <snipe@snipe.net>
+     * @since [v5.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
+    public function licenses()
     {
-        return $this->hasMany('\App\Models\License', 'depreciation_id')->count();
-    }
-
-      /**
-      * Query builder scope to search on text
-      *
-      * @param  \Illuminate\Database\Query\Builder  $query  Query builder instance
-      * @param  text                              $search      Search term
-      *
-      * @return \Illuminate\Database\Query\Builder          Modified query builder
-      */
-    public function scopeTextSearch($query, $search)
-    {
-
-        return $query->where(function ($query) use ($search) {
-
-             $query->where('name', 'LIKE', '%'.$search.'%')
-             ->orWhere('months', 'LIKE', '%'.$search.'%');
-        });
-    }
+        return $this->hasMany('\App\Models\License', 'depreciation_id');
+    }     
 }

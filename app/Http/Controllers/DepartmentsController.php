@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Department;
-use App\Helpers\Helper;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Image;
 use App\Http\Requests\ImageUploadRequest;
+use Illuminate\Support\Facades\Storage;
 
 class DepartmentsController extends Controller
 {
@@ -24,13 +24,15 @@ class DepartmentsController extends Controller
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @see AssetController::getDatatable() method that generates the JSON response
      * @since [v4.0]
-     * @return View
+     * @param Request $request
+     * @return \Illuminate\Support\Facades\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function index(Request $request)
     {
         $this->authorize('index', Department::class);
         $company = null;
-        if ($request->has('company_id')) {
+        if ($request->filled('company_id')) {
             $company = Company::find($request->input('company_id'));
         }
         return view('departments/index')->with('company', $company);
@@ -42,27 +44,19 @@ class DepartmentsController extends Controller
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v4.0]
-     * @param  \Illuminate\Http\Request  $request
+     * @param ImageUploadRequest $request
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function store(ImageUploadRequest $request)
     {
         $this->authorize('create', Department::class);
         $department = new Department;
         $department->fill($request->all());
-        $department->user_id = Auth::user()->id;
-        $department->manager_id = ($request->has('manager_id' ) ? $request->input('manager_id') : null);
+        $department->user_id = Auth::id();
+        $department->manager_id = $request->input('manager_id', null);
 
-        if ($request->file('image')) {
-            $image = $request->file('image');
-            $file_name = str_random(25).".".$image->getClientOriginalExtension();
-            $path = public_path('uploads/departments/'.$file_name);
-            Image::make($image->getRealPath())->resize(200, null, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            })->save($path);
-            $department->image = $file_name;
-        }
+        $department = $request->handleImages($department);
 
         if ($department->save()) {
             return redirect()->route("departments.index")->with('success', trans('admin/departments/message.create.success'));
@@ -78,15 +72,18 @@ class DepartmentsController extends Controller
      * @param int $id
      * @since [v4.0]
      * @return \Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function show($id)
     {
         $department = Department::find($id);
 
+        $this->authorize('view', $department);
+
         if (isset($department->id)) {
             return view('departments/view', compact('department'));
         }
-        return redirect()->route('departments.index')->with('error', trans('admin/departments/message.does_not_exist', compact('id')));
+        return redirect()->route('departments.index')->with('error', trans('admin/departments/message.does_not_exist'));
     }
 
 
@@ -97,9 +94,12 @@ class DepartmentsController extends Controller
      * @see DepartmentsController::postCreate() method that validates and stores the data
      * @since [v4.0]
      * @return \Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function create()
     {
+        $this->authorize('create', Department::class);
+
         return view('departments/edit')->with('item', new Department);
     }
 
@@ -111,6 +111,7 @@ class DepartmentsController extends Controller
      * @param int $locationId
      * @since [v4.0]
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy($id)
     {
@@ -118,72 +119,58 @@ class DepartmentsController extends Controller
             return redirect()->to(route('departments.index'))->with('error', trans('admin/departments/message.not_found'));
         }
 
+        $this->authorize('delete', $department);
+
         if ($department->users->count() > 0) {
             return redirect()->to(route('departments.index'))->with('error', trans('admin/departments/message.assoc_users'));
         }
 
+        if ($department->image) {
+            try  {
+                Storage::disk('public')->delete('departments'.'/'.$department->image);
+            } catch (\Exception $e) {
+                \Log::debug($e);
+            }
+        }
         $department->delete();
+
         return redirect()->back()->with('success', trans('admin/departments/message.delete.success'));
 
     }
 
     /**
-     * Makes a form view to edit location information.
+     * Makes a form view to edit Department information.
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @see LocationsController::postCreate() method that validates and stores
-     * @param int $locationId
+     * @param int $departmentId
      * @since [v1.0]
      * @return \Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function edit($id = null)
+    public function edit($departmentId = null)
     {
-        if (is_null($item = Department::find($id))) {
+        if (is_null($item = Department::find($departmentId))) {
             return redirect()->back()->with('error', trans('admin/locations/message.does_not_exist'));
         }
+
+        $this->authorize('update', $item);
+
         return view('departments/edit', compact('item'));
     }
 
     public function update(ImageUploadRequest $request, $id) {
 
-        $this->authorize('create', Department::class);
         if (is_null($department = Department::find($id))) {
             return redirect()->route('departments.index')->with('error', trans('admin/departments/message.does_not_exist'));
         }
 
+        $this->authorize('update', $department);
+
         $department->fill($request->all());
-        $department->manager_id = ($request->has('manager_id' ) ? $request->input('manager_id') : null);
+        $department->manager_id = ($request->filled('manager_id' ) ? $request->input('manager_id') : null);
 
-        $old_image = $department->image;
-
-        // Set the model's image property to null if the image is being deleted
-        if ($request->input('image_delete') == 1) {
-            $department->image = null;
-        }
-
-        if ($request->file('image')) {
-            $image = $request->file('image');
-            $file_name = $department->id.'-'.str_slug($image->getClientOriginalName()) . "." . $image->getClientOriginalExtension();
-
-            if ($image->getClientOriginalExtension()!='svg') {
-                Image::make($image->getRealPath())->resize(500, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                })->save(app('departments_upload_path').$file_name);
-            } else {
-                $image->move(app('departments_upload_path'), $file_name);
-            }
-            $department->image = $file_name;
-
-        }
-
-        if ((($request->file('image')) && (isset($old_image)) && ($old_image!='')) || ($request->input('image_delete') == 1)) {
-            try  {
-                unlink(app('departments_upload_path').$old_image);
-            } catch (\Exception $e) {
-                \Log::error($e);
-            }
-        }
+        $department = $request->handleImages($department);
 
         if ($department->save()) {
             return redirect()->route("departments.index")->with('success', trans('admin/departments/message.update.success'));

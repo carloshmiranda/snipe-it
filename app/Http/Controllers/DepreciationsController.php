@@ -1,15 +1,8 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Helpers\Helper;
-use Lang;
 use App\Models\Depreciation;
-use Redirect;
-use App\Models\Setting;
-use DB;
-use Str;
-use View;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 /**
@@ -21,31 +14,37 @@ use Illuminate\Http\Request;
 class DepreciationsController extends Controller
 {
     /**
-    * Returns a view that invokes the ajax tables which actually contains
-    * the content for the depreciation listing, which is generated in getDatatable.
-    *
-    * @author [A. Gianotto] [<snipe@snipe.net]
-    * @see DepreciationsController::getDatatable() method that generates the JSON response
-    * @since [v1.0]
-    * @return \Illuminate\Contracts\View\View
+     * Returns a view that invokes the ajax tables which actually contains
+     * the content for the depreciation listing, which is generated in getDatatable.
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net]
+     * @see DepreciationsController::getDatatable() method that generates the JSON response
+     * @since [v1.0]
+     * @return \Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function index()
     {
+        $this->authorize('view', Depreciation::class);
+
         // Show the page
         return view('depreciations/index', compact('depreciations'));
     }
 
 
     /**
-    * Returns a view that displays a form to create a new depreciation.
-    *
-    * @author [A. Gianotto] [<snipe@snipe.net]
-    * @see DepreciationsController::postCreate()
-    * @since [v1.0]
-    * @return \Illuminate\Contracts\View\View
+     * Returns a view that displays a form to create a new depreciation.
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net]
+     * @see DepreciationsController::postCreate()
+     * @since [v1.0]
+     * @return \Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function create()
     {
+        $this->authorize('create', Depreciation::class);
+
         // Show the page
         return view('depreciations/edit')->with('item', new Depreciation);
     }
@@ -59,9 +58,12 @@ class DepreciationsController extends Controller
      * @since [v1.0]
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Depreciation::class);
+
         // create a new instance
         $depreciation = new Depreciation();
         // Depreciation data
@@ -78,13 +80,14 @@ class DepreciationsController extends Controller
     }
 
     /**
-    * Returns a view that displays a form to update a depreciation.
-    *
-    * @author [A. Gianotto] [<snipe@snipe.net]
-    * @see DepreciationsController::postEdit()
-    * @param int $depreciationId
-    * @since [v1.0]
-    * @return \Illuminate\Contracts\View\View
+     * Returns a view that displays a form to update a depreciation.
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net]
+     * @see DepreciationsController::postEdit()
+     * @param int $depreciationId
+     * @since [v1.0]
+     * @return \Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function edit($depreciationId = null)
     {
@@ -93,6 +96,8 @@ class DepreciationsController extends Controller
             // Redirect to the blogs management page
             return redirect()->route('depreciations.index')->with('error', trans('admin/depreciations/message.does_not_exist'));
         }
+
+        $this->authorize('update', $item);
 
         return view('depreciations/edit', compact('item'));
     }
@@ -107,6 +112,7 @@ class DepreciationsController extends Controller
      * @param int $depreciationId
      * @return \Illuminate\Http\RedirectResponse
      * @since [v1.0]
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(Request $request, $depreciationId = null)
     {
@@ -115,6 +121,8 @@ class DepreciationsController extends Controller
             // Redirect to the blogs management page
             return redirect()->route('depreciations.index')->with('error', trans('admin/depreciations/message.does_not_exist'));
         }
+
+        $this->authorize('update', $depreciation);
 
         // Depreciation data
         $depreciation->name      = $request->input('name');
@@ -137,15 +145,18 @@ class DepreciationsController extends Controller
      * @since [v1.0]
      * @param integer $depreciationId
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy($depreciationId)
     {
         // Check if the depreciation exists
-        if (is_null($depreciation = Depreciation::find($depreciationId))) {
+        if (is_null($depreciation = Depreciation::withCount('models as models_count')->find($depreciationId))) {
             return redirect()->route('depreciations.index')->with('error', trans('admin/depreciations/message.not_found'));
         }
 
-        if ($depreciation->has_models() > 0) {
+        $this->authorize('delete', $depreciation);
+
+        if ($depreciation->models_count > 0) {
             // Redirect to the asset management page
             return redirect()->route('depreciations.index')->with('error', trans('admin/depreciations/message.assoc_users'));
         }
@@ -163,6 +174,7 @@ class DepreciationsController extends Controller
      * @param int $depreciationId
      * @since [v1.0]
      * @return \Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function show($id)
     {
@@ -170,6 +182,8 @@ class DepreciationsController extends Controller
             // Redirect to the blogs management page
             return redirect()->route('depreciations.index')->with('error', trans('admin/depreciations/message.does_not_exist'));
         }
+
+        $this->authorize('view', $depreciation);
 
         return view('depreciations/view', compact('depreciation'));
     }

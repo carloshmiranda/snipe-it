@@ -1,20 +1,11 @@
 <?php
 namespace App\Http\Controllers;
 
-use Input;
-use Lang;
+use Illuminate\Support\Facades\Input;
 use App\Models\Statuslabel;
-use App\Models\Asset;
-use Redirect;
-use DB;
-use App\Models\Setting;
-use Str;
-use View;
 use App\Helpers\Helper;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * This controller handles all actions related to Status Labels for
@@ -28,6 +19,7 @@ class StatuslabelsController extends Controller
      * Show a list of all the statuslabels.
      *
      * @return \Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
 
     public function index()
@@ -43,25 +35,25 @@ class StatuslabelsController extends Controller
             return view('statuslabels.view')->with('statuslabel', $statuslabel);
         }
 
-        return redirect()->route('statuslabels.index')->with('error', trans('admin/statuslabels/message.does_not_exist', compact('id')));
+        return redirect()->route('statuslabels.index')->with('error', trans('admin/statuslabels/message.does_not_exist'));
     }
-
 
 
     /**
      * Statuslabel create.
      *
      * @return \Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function create()
     {
         // Show the page
         $this->authorize('create', Statuslabel::class);
-        $item = new Statuslabel;
-        $use_statuslabel_type = $item->getStatuslabelType();
-        $statuslabel_types = Helper::statusTypeList();
 
-        return view('statuslabels/edit', compact('statuslabel_types', 'item'))->with('use_statuslabel_type', $use_statuslabel_type);
+        return view('statuslabels/edit')
+            ->with('item', new Statuslabel)
+            ->with('statuslabel_types', Helper::statusTypeList())
+            ->with('use_statuslabel_type', (new Statuslabel)->getStatuslabelType());
     }
 
 
@@ -70,6 +62,7 @@ class StatuslabelsController extends Controller
      *
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function store(Request $request)
     {
@@ -78,7 +71,7 @@ class StatuslabelsController extends Controller
         // create a new model instance
         $statusLabel = new Statuslabel();
 
-        if (!$request->has('statuslabel_types')) {
+        if (!$request->filled('statuslabel_types')) {
             return redirect()->back()->withInput()->withErrors(['statuslabel_types' => trans('validation.statuslabel_type')]);
         }
 
@@ -104,40 +97,11 @@ class StatuslabelsController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function apiStore(Request $request)
-    {
-        $this->authorize('create', Statuslabel::class);
-        $statuslabel = new Statuslabel();
-        if (!$request->has('statuslabel_types')) {
-            return JsonResponse::create(["error" => trans('validation.statuslabel_type')], 500);
-        }
-        $statustype = Statuslabel::getStatuslabelTypesForDB(Input::get('statuslabel_types'));
-        $statuslabel->name            = Input::get('name');
-        $statuslabel->user_id         = Auth::id();
-        $statuslabel->notes           =  '';
-        $statuslabel->deployable      =  $statustype['deployable'];
-        $statuslabel->pending         =  $statustype['pending'];
-        $statuslabel->archived        =  $statustype['archived'];
-
-
-        if ($statuslabel->isValid()) {
-            $statuslabel->save();
-            // Redirect to the new Statuslabel  page
-            return JsonResponse::create($statuslabel);
-        }
-        return JsonResponse::create(["error" => $statuslabel->getErrors()->first()], 500);
-
-    }
-
-
-    /**
      * Statuslabel update.
      *
-     * @param  int  $statuslabelId
+     * @param  int $statuslabelId
      * @return \Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function edit($statuslabelId = null)
     {
@@ -159,8 +123,9 @@ class StatuslabelsController extends Controller
     /**
      * Statuslabel update form processing page.
      *
-     * @param  int  $statuslabelId
+     * @param  int $statuslabelId
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(Request $request, $statuslabelId = null)
     {
@@ -171,7 +136,7 @@ class StatuslabelsController extends Controller
             return redirect()->route('statuslabels.index')->with('error', trans('admin/statuslabels/message.does_not_exist'));
         }
 
-        if (!$request->has('statuslabel_types')) {
+        if (!$request->filled('statuslabel_types')) {
             return redirect()->back()->withInput()->withErrors(['statuslabel_types' => trans('validation.statuslabel_type')]);
         }
 
@@ -199,8 +164,9 @@ class StatuslabelsController extends Controller
     /**
      * Delete the given Statuslabel.
      *
-     * @param  int  $statuslabelId
+     * @param  int $statuslabelId
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy($statuslabelId)
     {

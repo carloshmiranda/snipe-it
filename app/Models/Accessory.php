@@ -1,11 +1,14 @@
 <?php
 namespace App\Models;
 
+use App\Models\Traits\Acceptable;
+use App\Models\Traits\Searchable;
 use App\Presenters\Presentable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Watson\Validating\ValidatingTrait;
 use App\Notifications\CheckinAccessoryNotification;
 use App\Notifications\CheckoutAccessoryNotification;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Model for Accessories.
@@ -25,12 +28,29 @@ class Accessory extends SnipeModel
         'requestable' => 'boolean'
     ];
 
-    /**
-     * Set static properties to determine which checkout/checkin handlers we should use
-     */
-    public static $checkoutClass = CheckoutAccessoryNotification::class;
-    public static $checkinClass = CheckinAccessoryNotification::class;
+    use Searchable;
 
+    use Acceptable;
+    
+    /**
+     * The attributes that should be included when searching the model.
+     * 
+     * @var array
+     */
+    protected $searchableAttributes = ['name', 'model_number', 'order_number', 'purchase_date'];
+
+    /**
+     * The relations and their attributes that should be included when searching the model.
+     * 
+     * @var array
+     */
+    protected $searchableRelations = [
+        'category'     => ['name'],
+        'company'      => ['name'],
+        'manufacturer' => ['name'],
+        'supplier'     => ['name'],
+        'location'     => ['name']
+    ];
 
     /**
     * Accessory validation rules
@@ -78,13 +98,26 @@ class Accessory extends SnipeModel
 
 
 
-
+    /**
+     * Establishes the accessory -> supplier relationship
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
     public function supplier()
     {
         return $this->belongsTo('\App\Models\Supplier', 'supplier_id');
     }
-    
 
+
+    /**
+     * Sets the requestable attribute on the accessory
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v4.0]
+     * @return void
+     */
     public function setRequestableAttribute($value)
     {
         if ($value == '') {
@@ -94,62 +127,176 @@ class Accessory extends SnipeModel
         return;
     }
 
+    /**
+     * Establishes the accessory -> company relationship
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
     public function company()
     {
         return $this->belongsTo('\App\Models\Company', 'company_id');
     }
 
+    /**
+     * Establishes the accessory -> location relationship
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
     public function location()
     {
         return $this->belongsTo('\App\Models\Location', 'location_id');
     }
 
+    /**
+     * Establishes the accessory -> category relationship
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
     public function category()
     {
         return $this->belongsTo('\App\Models\Category', 'category_id')->where('category_type', '=', 'accessory');
     }
 
     /**
-    * Get action logs for this accessory
-    */
+     * Returns the action logs associated with the accessory
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
     public function assetlog()
     {
         return $this->hasMany('\App\Models\Actionlog', 'item_id')->where('item_type', Accessory::class)->orderBy('created_at', 'desc')->withTrashed();
     }
 
+    /**
+     * Get the LAST checkout for this accessory.
+     * 
+     * This is kinda gross, but is necessary for how the accessory
+     * pivot stuff works for now.
+     *
+     * It looks like we should be able to use ->first() here and
+     * return an object instead of a collection, but we actually
+     * cannot.
+     *
+     * In short, you cannot execute the query defined when you're eager loading.
+     * and in order to avoid 1001 query problems when displaying the most
+     * recent checkout note, we have to eager load this.
+     *
+     * This means we technically return a collection of one here, and then
+     * in the controller, we convert that collection to an array, so we can
+     * use it in the transformer to display only the notes of the LAST
+     * checkout.
+     *
+     * It's super-mega-assy, but it's the best I could do for now.
+     *
+     * @author  A. Gianotto <snipe@snipe.net>
+     * @since v5.0.0
+     *
+     * @see \App\Http\Controllers\Api\AccessoriesController\checkedout()
+     *
+     */
+    public function lastCheckout()
+    {
+        return $this->assetlog()->where('action_type','=','checkout')->take(1);
+    }
+
+
+    /**
+     * Sets the full image url
+     *
+     * @todo this should probably be moved out of the model and into a
+     * presenter or service provider
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return string
+     */
     public function getImageUrl() {
         if ($this->image) {
-            return url('/').'/uploads/accessories/'.$this->image;
+            return Storage::disk('public')->url(app('accessories_upload_path').$this->image);
         }
         return false;
 
     }
+
+    /**
+     * Establishes the accessory -> users relationship
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
 
     public function users()
     {
         return $this->belongsToMany('\App\Models\User', 'accessories_users', 'accessory_id', 'assigned_to')->withPivot('id')->withTrashed();
     }
 
+    /**
+     * Checks whether or not the accessory has users
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return int
+     */
     public function hasUsers()
     {
         return $this->belongsToMany('\App\Models\User', 'accessories_users', 'accessory_id', 'assigned_to')->count();
     }
 
+    /**
+     * Establishes the accessory -> manufacturer relationship
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
     public function manufacturer()
     {
         return $this->belongsTo('\App\Models\Manufacturer', 'manufacturer_id');
     }
 
+    /**
+     * Determins whether or not an email should be sent for checkin/checkout of this
+     * accessory based on the category it belongs to.
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return boolean
+     */
     public function checkin_email()
     {
         return $this->category->checkin_email;
     }
 
+    /**
+     * Determines whether or not the accessory should require the user to
+     * accept it via email.
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return boolean
+     */
     public function requireAcceptance()
     {
         return $this->category->require_acceptance;
     }
 
+    /**
+     * Checks for a category-specific EULA, and if that doesn't exist,
+     * checks for a settings level EULA
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return string
+     */
     public function getEula()
     {
 
@@ -163,46 +310,19 @@ class Accessory extends SnipeModel
             return null;
     }
 
+    /**
+     * Check how many items of an accessory remain
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return int
+     */
     public function numRemaining()
     {
         $checkedout = $this->users->count();
         $total = $this->qty;
         $remaining = $total - $checkedout;
         return $remaining;
-    }
-
-    /**
-    * Query builder scope to search on text
-    *
-    * @param  \Illuminate\Database\Query\Builder  $query  Query builder instance
-    * @param  text                              $search      Search term
-    *
-    * @return \Illuminate\Database\Query\Builder          Modified query builder
-    */
-    public function scopeTextSearch($query, $search)
-    {
-
-        return $query->where(function ($query) use ($search) {
-
-                    $query->whereHas('category', function ($query) use ($search) {
-                        $query->where('categories.name', 'LIKE', '%'.$search.'%');
-                    })->orWhere(function ($query) use ($search) {
-                        $query->whereHas('company', function ($query) use ($search) {
-                            $query->where('companies.name', 'LIKE', '%'.$search.'%');
-                        });
-                    })->orWhere(function ($query) use ($search) {
-                        $query->whereHas('manufacturer', function ($query) use ($search) {
-                            $query->where('manufacturers.name', 'LIKE', '%'.$search.'%');
-                        });
-                    })->orWhere(function ($query) use ($search) {
-                        $query->whereHas('location', function ($query) use ($search) {
-                            $query->where('locations.name', 'LIKE', '%'.$search.'%');
-                        });
-                    })->orWhere('accessories.name', 'LIKE', '%'.$search.'%')
-                            ->orWhere('accessories.model_number', 'LIKE', '%'.$search.'%')
-                            ->orWhere('accessories.order_number', 'LIKE', '%'.$search.'%');
-
-        });
     }
 
     /**

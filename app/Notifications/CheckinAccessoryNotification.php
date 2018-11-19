@@ -2,8 +2,10 @@
 
 namespace App\Notifications;
 
+use App\Models\Accessory;
 use App\Models\Setting;
 use App\Models\SnipeModel;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -14,31 +16,19 @@ use Illuminate\Support\Facades\Mail;
 class CheckinAccessoryNotification extends Notification
 {
     use Queueable;
-    /**
-     * @var
-     */
-    private $params;
 
     /**
      * Create a new notification instance.
      *
      * @param $params
      */
-    public function __construct($params)
+    public function __construct(Accessory $accessory, $checkedOutTo, User $checkedInby, $note)
     {
-        $this->target = $params['target'];
-        $this->item = $params['item'];
-        $this->admin = $params['admin'];
-        $this->note = '';
-        $this->target_type = $params['target'];
-        $this->settings = $params['settings'];
-
-        if (array_key_exists('note', $params)) {
-            $this->note = $params['note'];
-        }
-
-
-
+        $this->item     = $accessory;
+        $this->target   = $checkedOutTo;
+        $this->admin    = $checkedInby;
+        $this->note     = $note;
+        $this->settings = Setting::getSettings();
     }
 
     /**
@@ -56,9 +46,13 @@ class CheckinAccessoryNotification extends Notification
             $notifyBy[] = 'slack';
         }
 
-        // Make sure the target is a user and that its appropriate to send them an email
-        if (($this->target_type == \App\Models\User::class) && (($this->item->requireAcceptance() == '1') || ($this->item->getEula())))
+        /**
+         * Only send checkin notifications to users if the category 
+         * has the corresponding checkbox checked. 
+         */
+        if ($this->item->checkin_email() && $this->target instanceof User && $this->target->email != '')
         {
+            \Log::debug('use email');
             $notifyBy[] = 'mail';
         }
 

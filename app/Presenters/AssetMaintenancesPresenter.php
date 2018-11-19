@@ -46,6 +46,14 @@ class AssetMaintenancesPresenter extends Presenter
                 "title" => trans('admin/hardware/table.asset_tag'),
                 "formatter" => "assetTagLinkFormatter"
             ], [
+                "field" => "model",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('admin/hardware/form.model'),
+                "visible" => false,
+                "formatter" => "modelsLinkObjFormatter"
+            ],[
                 "field" => "supplier",
                 "searchable" => true,
                 "sortable" => true,
@@ -70,7 +78,7 @@ class AssetMaintenancesPresenter extends Presenter
                 "sortable" => true,
                 "title" => trans('admin/asset_maintenances/form.title'),
             ], [
-                "field" => "created_at",
+                "field" => "start_date",
                 "searchable" => true,
                 "sortable" => true,
                 "title" => trans('admin/asset_maintenances/form.start_date'),

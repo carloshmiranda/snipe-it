@@ -12,9 +12,14 @@ use Illuminate\Validation\Rule;
 
 class CustomField extends Model
 {
-    use ValidatingTrait, UniqueUndeletedTrait;
-    public $guarded=["id"];
-    public static $PredefinedFormats=[
+    use ValidatingTrait,
+        UniqueUndeletedTrait;
+
+    public $guarded = [
+        "id"
+    ];
+
+    public static $PredefinedFormats = [
         "ANY" => "",
         "CUSTOM REGEX" => "",
         "ALPHA" => "alpha",
@@ -32,6 +37,14 @@ class CustomField extends Model
     ];
 
     /**
+     * Validation rules.
+     * At least empty array must be provided if using ValidatingTrait.
+     *
+     * @var array
+     */
+    protected $rules = [];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -46,12 +59,16 @@ class CustomField extends Model
         'show_in_email',
     ];
 
-    // This is confusing, since it's actually the custom fields table that
-    // we're usually modifying, but since we alter the assets table, we have to
-    // say that here, otherwise the new fields get added onto the custom fields
-    // table instead of the assets table.
+    /**
+     * This is confusing, since it's actually the custom fields table that
+     * we're usually modifying, but since we alter the assets table, we have to
+     * say that here, otherwise the new fields get added onto the custom fields
+     * table instead of the assets table.
+     *
+     * @author [Brady Wetherington] [<uberbrady@gmail.com>]
+     * @since [v3.0]
+     */
     public static $table_name = "assets";
-
 
     /**
      * Convert the custom field's name property to a db-safe string.
@@ -82,6 +99,7 @@ class CustomField extends Model
      */
     public static function boot()
     {
+        parent::boot();
         self::created(function ($custom_field) {
 
             // Column already exists on the assets table - nothing to do here.
@@ -138,16 +156,37 @@ class CustomField extends Model
         });
     }
 
+    /**
+     * Establishes the customfield -> fieldset relationship
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
     public function fieldset()
     {
         return $this->belongsToMany('\App\Models\CustomFieldset');
     }
 
+    /**
+     * Establishes the customfield -> admin user relationship
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
     public function user()
     {
         return $this->belongsTo('\App\Models\User');
     }
 
+    /**
+     * Establishes the customfield -> default values relationship
+     *
+     * @author Hannah Tinkler
+     * @since [v3.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
     public function defaultValues()
     {
         return $this->belongsToMany('\App\Models\AssetModel', 'models_custom_fields')->withPivot('default_value');
@@ -169,11 +208,28 @@ class CustomField extends Model
         })->first();
     }
 
+    /**
+     * Checks the format of the attribute
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @param $value string
+     * @since [v3.0]
+     * @return boolean
+     */
     public function check_format($value)
     {
         return preg_match('/^'.$this->attributes['format'].'$/', $value)===1;
     }
 
+    /**
+     * Gets the DB column name.
+     *
+     * @todo figure out if this is still needed? I don't know WTF it's for.
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v3.0]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
     public function db_column_name()
     {
         return $this->db_column;
@@ -188,7 +244,7 @@ class CustomField extends Model
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v3.4]
-     * @return Array
+     * @return string
      */
     public function getFormatAttribute($value)
     {
@@ -205,7 +261,7 @@ class CustomField extends Model
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v3.4]
-     * @return Array
+     * @return array
      */
     public function setFormatAttribute($value)
     {
@@ -221,7 +277,7 @@ class CustomField extends Model
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v3.4]
-     * @return Array
+     * @return array
      */
     public function formatFieldValuesAsArray()
     {
@@ -249,7 +305,7 @@ class CustomField extends Model
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v3.4]
-     * @return Boolean
+     * @return boolean
      */
     public function isFieldDecryptable($string)
     {
@@ -266,7 +322,7 @@ class CustomField extends Model
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v3.4]
-     * @return Boolean
+     * @return boolean
      */
     public function convertUnicodeDbSlug($original = null)
     {
@@ -287,7 +343,7 @@ class CustomField extends Model
     * @author [V. Cordes] [<volker@fdatek.de>]
     * @param int $id
     * @since [v4.1.10]
-    * @return Array
+    * @return array
     */
     public function validationRules()
     {

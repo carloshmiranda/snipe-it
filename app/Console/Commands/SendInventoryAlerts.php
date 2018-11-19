@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Setting;
-use DB;
-use Mail;
 use App\Helpers\Helper;
-
+use App\Models\Recipients\AlertRecipient;
+use App\Models\Setting;
+use App\Notifications\InventoryAlert;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Notification;
 
 class SendInventoryAlerts extends Command
 {
@@ -27,8 +27,6 @@ class SendInventoryAlerts extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -42,28 +40,26 @@ class SendInventoryAlerts extends Command
      */
     public function handle()
     {
-        if ((Setting::getSettings()->alert_email!='')  && (Setting::getSettings()->alerts_enabled==1)) {
+        $settings = Setting::getSettings();
 
-            $data['data'] = Helper::checkLowInventory();
-            $data['count'] = count($data['data']);
+        if (($settings->alert_email != '') && ($settings->alerts_enabled == 1)) {
+            $items = Helper::checkLowInventory();
 
-            if (count($data['data']) > 0) {
-                \Mail::send('emails.low-inventory', $data, function ($m) {
-                    $m->to(explode(',', Setting::getSettings()->alert_email), Setting::getSettings()->site_name);
-                    $m->replyTo(config('mail.reply_to.address'), config('mail.reply_to.name'));
-                    $m->subject(trans('mail.Low_Inventory_Report'));
+            if (($items) && (count($items) > 0)) {
+                $this->info(trans_choice('mail.low_inventory_alert', count($items)));
+                // Send a rollup to the admin, if settings dictate
+                $recipients = collect(explode(',', $settings->alert_email))->map(function ($item, $key) {
+                    return new AlertRecipient($item);
                 });
 
+                Notification::send($recipients, new InventoryAlert($items, $settings->alert_threshold));
             }
-
         } else {
-            if (Setting::getSettings()->alert_email=='') {
-                echo "Could not send email. No alert email configured in settings. \n";
-            } elseif (Setting::getSettings()->alerts_enabled!=1) {
-                echo "Alerts are disabled in the settings. No mail will be sent. \n";
+            if ($settings->alert_email == '') {
+                $this->error('Could not send email. No alert email configured in settings');
+            } elseif (1 != $settings->alerts_enabled) {
+                $this->info('Alerts are disabled in the settings. No mail will be sent');
             }
         }
-
-
     }
 }

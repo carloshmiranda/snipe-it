@@ -18,7 +18,6 @@
       @if ($snipeSettings->ldap_enabled == 1)
       <a href="{{ route('ldap/user') }}" class="btn btn-default pull-right"><span class="fa fa-sitemap"></span> LDAP Sync</a>
       @endif
-      <a href="{{ route('import/user') }}" class="btn btn-default pull-right" style="margin-right: 5px;"><span class="fa fa-upload"></span> {{ trans('general.import') }}</a>
       <a href="{{ route('users.create') }}" class="btn btn-primary pull-right" style="margin-right: 5px;">  {{ trans('general.create') }}</a>
     @endcan
 
@@ -51,6 +50,7 @@
                   <select name="bulk_actions" class="form-control select2" style="width: 200px;">
                     <option value="delete">Bulk Checkin &amp; Delete</option>
                     <option value="edit">Bulk Edit</option>
+                    <option value="bulkpasswordreset">Send Password Reset</option>
                   </select>
                   <button class="btn btn-default" id="bulkEdit" disabled>Go</button>
                 </div>

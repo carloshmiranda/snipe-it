@@ -45,6 +45,11 @@ $factory->define(App\Models\Component::class, function (Faker\Generator $faker) 
     ];
 });
 
+$factory->define(App\Models\Group::class, function (Faker\Generator $faker) {
+    return [
+    'name' => $faker->name,
+    ];
+});
 
 $factory->define(App\Models\Location::class, function (Faker\Generator $faker) {
     return [
@@ -91,5 +96,6 @@ $factory->define(App\Models\Setting::class, function ($faker) {
         'default_currency' => $faker->currencyCode,
         'locale' => $faker->locale,
         'pwd_secure_min' => 10, // Match web setup
+        'email_domain' => 'test.com',
     ];
 });
