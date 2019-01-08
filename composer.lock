@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fac7e8b237f1d78fb4057766c2c47da5",
+    "content-hash": "e6094557b60dedd4a2a1bf69f2e126b6",
     "packages": [
         {
             "name": "adldap2/adldap2",
@@ -58,6 +58,60 @@
                 "windows"
             ],
             "time": "2018-12-06T15:03:32+00:00"
+        },
+        {
+            "name": "amazee/laragoon-support-libs",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/AmazeeLabs/laragoon_support_libs.git",
+                "reference": "16170894a8a5e640082bed5896b71e188143bdb8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/AmazeeLabs/laragoon_support_libs/zipball/16170894a8a5e640082bed5896b71e188143bdb8",
+                "reference": "16170894a8a5e640082bed5896b71e188143bdb8",
+                "shasum": ""
+            },
+            "require": {
+                "symfony/yaml": "^3.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Amazee\\LaragoonSupport\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Blaize Kaye",
+                    "email": "blaize.kaye@gmail.com"
+                },
+                {
+                    "name": "Bryan Gruneberg",
+                    "email": "hello@bryangruneberg.com"
+                }
+            ],
+            "description": "Access the lagoon API from PHP",
+            "keywords": [
+                "amazee",
+                "amazee.io",
+                "console",
+                "deploy",
+                "devops",
+                "docker",
+                "lagoon",
+                "laravel",
+                "php"
+            ],
+            "time": "2018-11-16T11:47:22+00:00"
         },
         {
             "name": "aws/aws-sdk-php",
@@ -187,6 +241,68 @@
             "description": "BaconQrCode is a QR code generator for PHP.",
             "homepage": "https://github.com/Bacon/BaconQrCode",
             "time": "2017-10-17T09:59:25+00:00"
+        },
+        {
+            "name": "bryangruneberg/laragoon",
+            "version": "0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bryangruneberg/laragoon.git",
+                "reference": "83bc9a922519ff4e906c5ed320245f5575c6a116"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bryangruneberg/laragoon/zipball/83bc9a922519ff4e906c5ed320245f5575c6a116",
+                "reference": "83bc9a922519ff4e906c5ed320245f5575c6a116",
+                "shasum": ""
+            },
+            "require": {
+                "amazee/laragoon-support-libs": "dev-master",
+                "php": ">=5.6.4"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bryangruneberg\\Laragoon\\LaragoonServiceProvider"
+                    ],
+                    "aliases": {
+                        "Laragoon": "Bryangruneberg\\Laragoon\\LaragoonFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bryangruneberg\\Laragoon\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Blaize Kaye",
+                    "email": "blaize.kaye@gmail.com"
+                },
+                {
+                    "name": "Bryan Gruneberg",
+                    "email": "hello@bryangruneberg.com"
+                }
+            ],
+            "description": "The Laragoon utility package",
+            "homepage": "https://laragoon.io",
+            "keywords": [
+                "amazee",
+                "amazee.io",
+                "console",
+                "deploy",
+                "devops",
+                "docker",
+                "lagoon",
+                "laravel"
+            ],
+            "time": "2018-11-14T18:59:22+00:00"
         },
         {
             "name": "defuse/php-encryption",
@@ -6351,6 +6467,64 @@
             "time": "2018-11-25T12:50:42+00:00"
         },
         {
+            "name": "symfony/yaml",
+            "version": "v3.4.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "033cfa61ef06ee0847e056e530201842b6e926c3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/033cfa61ef06ee0847e056e530201842b6e926c3",
+                "reference": "033cfa61ef06ee0847e056e530201842b6e926c3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5.9|>=7.0.8"
+            },
+            "conflict": {
+                "symfony/console": "<3.4"
+            },
+            "require-dev": {
+                "symfony/console": "~3.4|~4.0"
+            },
+            "suggest": {
+                "symfony/console": "For validating YAML files using the lint command"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Yaml Component",
+            "homepage": "https://symfony.com",
+            "time": "2018-04-08T08:21:29+00:00"
+        },
+        {
             "name": "tecnickcom/tc-lib-barcode",
             "version": "1.15.12",
             "source": {
@@ -8676,65 +8850,6 @@
             "time": "2018-07-26T11:00:39+00:00"
         },
         {
-            "name": "symfony/yaml",
-            "version": "v4.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/yaml.git",
-                "reference": "c41175c801e3edfda90f32e292619d10c27103d7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/c41175c801e3edfda90f32e292619d10c27103d7",
-                "reference": "c41175c801e3edfda90f32e292619d10c27103d7",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.1.3",
-                "symfony/polyfill-ctype": "~1.8"
-            },
-            "conflict": {
-                "symfony/console": "<3.4"
-            },
-            "require-dev": {
-                "symfony/console": "~3.4|~4.0"
-            },
-            "suggest": {
-                "symfony/console": "For validating YAML files using the lint command"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.2-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Yaml\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Yaml Component",
-            "homepage": "https://symfony.com",
-            "time": "2018-11-11T19:52:12+00:00"
-        },
-        {
             "name": "theseer/tokenizer",
             "version": "1.1.0",
             "source": {
@@ -8776,11 +8891,12 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
+        "amazee/laragoon-support-libs": 20,
         "roave/security-advisories": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.1.3"
