@@ -9,13 +9,10 @@ RUN apk add \
 &&docker-php-ext-configure ldap --with-libdir=lib/ \
 && docker-php-ext-install ldap
 
-RUN mkdir -p /app/storage/framework/
-RUN mkdir -p /app/storage/framework/cache/
-RUN mkdir -p /app/storage/framework/sessions/
-RUN mkdir -p /app/storage/framework/views/
-
 RUN npm install
 RUN composer install --no-dev --prefer-dist
+
+COPY . /app
 
 ENV APP_ENV=${LAGOON_ENVIRONMENT_TYPE}
 ENV WEBROOT=public
