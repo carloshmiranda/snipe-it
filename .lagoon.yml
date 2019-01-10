@@ -9,11 +9,16 @@ endpoint: api-lagoon-master.lagoon.ch.amazee.io:31472
 api: api-lagoon-master.lagoon.ch.amazee.io:80
 
 tasks:
-  post-rollout:
+  pre-rollout:
     - run:
         name: Create directories
-        command: mkdir - p /app/storage/framework/cache
+        command: mkdir - p /app/storage/framework/ & mkdir - p /app/storage/framework/cache/ & mkdir - p /app/storage/framework/sessions/ & mkdir - p /app/storage/framework/views/
         service: cli
+  post-rollout:
+#    - run:
+#        name: Create directories
+#        command: mkdir - p /app/storage/framework/ & mkdir - p /app/storage/framework/cache/ & mkdir - p /app/storage/framework/sessions/ & mkdir - p /app/storage/framework/views/
+#        service: cli
     - run:
         name: Run migrations
         command: php artisan migrate
