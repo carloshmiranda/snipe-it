@@ -12,7 +12,7 @@ tasks:
   post-rollout:
     - run:
         name: Create directories
-        command: mkdir - p /app/storage/framework/ & mkdir - p /app/storage/framework/cache/ & mkdir - p /app/storage/framework/sessions/ & mkdir - p /app/storage/framework/views/
+        command: mkdir /app/storage/framework/ & mkdir /app/storage/framework/cache/ & mkdir /app/storage/framework/sessions/ & mkdir /app/storage/framework/views/
         service: cli
     - run:
         name: Run migrations
