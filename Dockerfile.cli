@@ -1,4 +1,4 @@
-FROM amazeeio/node:6-builder as nodebuilder
+FROM amazeeio/node:8-builder as nodebuilder
 
 RUN echo '{ "allow_root": true }' > /home/.bowerrc
 RUN echo 'unsafe-perm=true' > /home/.npmrc
