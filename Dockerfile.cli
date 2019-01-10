@@ -1,3 +1,12 @@
+FROM amazeeio/node:6-builder as nodebuilder
+
+RUN echo '{ "allow_root": true }' > /home/.bowerrc
+RUN echo 'unsafe-perm=true' > /home/.npmrc
+
+COPY . /app/
+
+RUN npm install
+
 FROM amazeeio/php:7.2-cli
 COPY lagoon/php-cli.ini /usr/local/etc/php/php.ini
 
@@ -11,6 +20,7 @@ RUN apk add \
 
 RUN composer install --no-dev --prefer-dist
 
+COPY --from=nodebuilder /app/ /app/
 COPY . /app
 
 ENV APP_ENV=${LAGOON_ENVIRONMENT_TYPE}
