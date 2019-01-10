@@ -11,6 +11,10 @@ api: api-lagoon-master.lagoon.ch.amazee.io:80
 tasks:
   post-rollout:
     - run:
+        name: Create directories
+        command: mkdir - p /app/storage/framework/cache
+        service: cli
+    - run:
         name: Run migrations
         command: php artisan migrate
         service: cli
