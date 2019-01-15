@@ -12,7 +12,7 @@ x-environment:
   &default-environment
     LAGOON_PROJECT: *lagoon-project
     # Route that should be used locally
-    LAGOON_ROUTE: http://snipeit.docker.amazee.io
+    LAGOON_ROUTE: https://snipeit-dev-lagoon.docker.amazee.io
     # Uncomment if you like to have the system behave like in production
     #LAGOON_ENVIRONMENT_TYPE: production
     # Uncomment to enable xdebug and then restart via `docker-compose up -d`
@@ -26,9 +26,7 @@ services:
       dockerfile: Dockerfile.cli
     image: *lagoon-project # this image will be reused as `CLI_IMAGE` in subsequent Docker builds
     labels:
-      lagoon.type: cli-persistent
-      lagoon.persistent.name: nginx # mount the persistent storage of nginx into this container
-      lagoon.persistent: /app/storage/ # location where the persistent storage should be mounted
+      lagoon.type: cli
     << : *default-volumes # loads the defined volumes from the top
     volumes_from: # mount the ssh-agent from the pygmy or cachalot ssh-agent
       - container:amazeeio-ssh-agent
@@ -44,8 +42,7 @@ services:
       args:
         CLI_IMAGE: *lagoon-project # Inject the name of the cli image
     labels:
-      lagoon.type: nginx-php-persistent
-      lagoon.persistent: /app/storage/ # define where the persistent storage should be mounted too
+      lagoon.type: nginx-php
     << : *default-volumes # loads the defined volumes from the top
     depends_on:
       - cli
@@ -62,9 +59,8 @@ services:
       args:
         CLI_IMAGE: *lagoon-project
     labels:
-      lagoon.type: nginx-php-persistent
+      lagoon.type: nginx-php
       lagoon.name: nginx # we want this service be part of the nginx pod in Lagoon
-      lagoon.persistent: /app/storage/ # define where the persistent storage should be mounted too
     << : *default-volumes # loads the defined volumes from the top
     depends_on:
       - cli
