@@ -29,3 +29,7 @@ environments:
        schedule: "* * * * *"
        command: cd /app && php artisan schedule:run
        service: cli
+ dev-lagoon:
+   route:
+     - nginx:
+       - "snipeit-dev-lagoon.ch.amazee.io"
