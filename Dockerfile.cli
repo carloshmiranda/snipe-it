@@ -18,7 +18,7 @@ RUN apk add \
 &&docker-php-ext-configure ldap --with-libdir=lib/ \
 && docker-php-ext-install ldap
 
-RUN composer install --no-dev --prefer-dist
+RUN composer install --optimize-autoloader --apcu-autoloader
 
 COPY --from=nodebuilder /app/ /app/
 COPY . /app
