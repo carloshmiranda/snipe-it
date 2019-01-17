@@ -31,5 +31,5 @@ environments:
        service: cli
  dev-lagoon:
    route:
-     - nginx:
+     - varnish:
        - "snipeit-dev-lagoon.ch.amazee.io"
