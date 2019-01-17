@@ -77,12 +77,11 @@ services:
       << : *default-environment
 
   redis:
-      image: amazeeio/redis
-      labels:
-        lagoon.type: redis
-      << : *default-user # uses the defined user from top
-      environment:
-        << : *default-environment
+    image: amazeeio/redis
+    labels:
+      lagoon.type: redis
+    environment:
+      << : *default-environment
 
 networks:
   amazeeio-network:
