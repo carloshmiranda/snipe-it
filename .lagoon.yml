@@ -18,6 +18,14 @@ tasks:
         name: Run migrations
         command: php artisan migrate
         service: cli
+    - run:
+        name: Clear config
+        command: php artisan config:clear
+        service: cli
+    - run:
+        name: Clear cache
+        command: php artisan config:cache
+        service: cli
 
 environments:
  master:
