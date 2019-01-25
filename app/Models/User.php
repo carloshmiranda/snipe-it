@@ -15,11 +15,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Http\Traits\UniqueUndeletedTrait;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use DB;
 
 
 
-class User extends SnipeModel implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract
+class User extends SnipeModel implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract, HasLocalePreference
 {
     protected $presenter = 'App\Presenters\UserPresenter';
     use SoftDeletes, ValidatingTrait;
@@ -439,18 +440,6 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
         return $this->belongsToMany(Asset::class, 'checkout_requests', 'user_id', 'requestable_id')->whereNull('canceled_at');
     }
 
-    /**
-     * Query builder scope to return deleted users
-     * @author A. Gianotto <snipe@snipe.net>
-     * @since [v2.0]
-     *
-     * @param  string $query
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function scopeGetDeleted($query)
-    {
-        return $query->withTrashed()->whereNotNull('deleted_at');
-    }
 
     /**
      * Query builder scope to return NOT-deleted users
@@ -590,18 +579,6 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
         });
     }
 
-    /**
-     * Query builder scope for Deleted users
-     *
-     * @param  \Illuminate\Database\Query\Builder $query Query builder instance
-     * @return \Illuminate\Database\Query\Builder          Modified query builder
-     */
-
-    public function scopeDeleted($query)
-    {
-        return $query->whereNotNull('deleted_at');
-    }
-
 
     /**
      * Query builder scope to order on manager
@@ -642,5 +619,9 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
     public function scopeOrderDepartment($query, $order)
     {
         return $query->leftJoin('departments as departments_users', 'users.department_id', '=', 'departments_users.id')->orderBy('departments_users.name', $order);
+    }
+
+    public function preferredLocale(){
+        return $this->locale;
     }
 }
