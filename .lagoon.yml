@@ -30,7 +30,7 @@ tasks:
 environments:
  master:
    routes:
-    - nginx:
+    - varnish:
        - "snipeit.amazeelabs.com"
    cronjobs:
      - name: artisan schedule
