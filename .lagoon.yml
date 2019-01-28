@@ -30,7 +30,7 @@ tasks:
 environments:
  master:
    routes:
-    - varnish:
+    - nginx:
        - "snipeit.amazeelabs.com"
    cronjobs:
      - name: artisan schedule
@@ -39,5 +39,5 @@ environments:
        service: cli
  dev-lagoon:
    routes:
-      - varnish:
+      - nginx:
         - "snipeit-dev-lagoon.ch.amazee.io"
