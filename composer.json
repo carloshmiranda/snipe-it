@@ -9,7 +9,7 @@
     "adldap2/adldap2": "^9.1",
     "amazee/laragoon-support-libs": "dev-master",
     "bacon/bacon-qr-code": "^1.0",
-    "bryangruneberg/laragoon": "^0.4.0",
+    "bryangruneberg/laragoon": "^0.6.0",
     "doctrine/cache": "^1.6",
     "doctrine/common": "^2.7",
     "doctrine/dbal": "^2.8.0",
