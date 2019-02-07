@@ -18,6 +18,7 @@ RUN apk add \
 &&docker-php-ext-configure ldap --with-libdir=lib/ \
 && docker-php-ext-install ldap
 
+###Create symlinks for data directories
 RUN \
 	rm -r "/app/storage/private_uploads/" \
 	&& mkdir -p "/app/data/private_uploads" && ln -fs "/app/data/private_uploads" "/app/storage/private_uploads" \
@@ -27,6 +28,24 @@ RUN \
     && mkdir -p "/app/keys" && ln -fs "/app/keys/oauth-private.key" "/app/storage/oauth-private.key" \
     && ln -fs "/app/keys/oauth-public.key" "/app/storage/oauth-public.key" \
     && fix-permissions "/app/keys/"
+
+#Create data directories
+RUN \
+  mkdir -p '/app/data/private_uploads' \
+  && mkdir -p '/app/data/uploads/accessories' \
+  && mkdir -p '/app/data/uploads/avatars' \
+  && mkdir -p '/app/data/uploads/barcodes' \
+  && mkdir -p '/app/data/uploads/categories' \
+  && mkdir -p '/app/data/uploads/companies' \
+  && mkdir -p '/app/data/uploads/components' \
+  && mkdir -p '/app/data/uploads/consumables' \
+  && mkdir -p '/app/data/uploads/departments' \
+  && mkdir -p '/app/data/uploads/locations' \
+  && mkdir -p '/app/data/uploads/manufacturers' \
+  && mkdir -p '/app/data/uploads/models' \
+  && mkdir -p '/app/data/uploads/suppliers' \
+  && mkdir -p '/app/dumps' \
+  && mkdir -p '/app/keys'
 
 RUN composer install --optimize-autoloader --apcu-autoloader
 
