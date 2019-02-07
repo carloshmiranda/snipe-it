@@ -25,7 +25,8 @@ RUN \
     && mkdir -p "/app/data/uploads" && ln -fs "/app/data/uploads" "/app/public/uploads" \
     && mkdir -p "/app/dumps" && rm -r "/app/storage/app/backups" && ln -fs "/app/dumps" "/app/storage/app/backups" \
     && mkdir -p "/app/keys" && ln -fs "/app/keys/oauth-private.key" "/app/storage/oauth-private.key" \
-    && ln -fs "/app/keys/oauth-public.key" "/app/storage/oauth-public.key"
+    && ln -fs "/app/keys/oauth-public.key" "/app/storage/oauth-public.key" \
+    && fix-permissions "/app/keys/"
 
 RUN composer install --optimize-autoloader --apcu-autoloader
 
