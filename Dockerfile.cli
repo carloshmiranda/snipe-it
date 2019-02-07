@@ -19,7 +19,7 @@ RUN apk add \
 && docker-php-ext-install ldap
 
 RUN \
-	rm -r "/app/storage/private_uploads" \
+	rm -r "/app/storage/private_uploads/" \
 	&& mkdir -p "/app/data/private_uploads" && ln -fs "/app/data/private_uploads" "/app/storage/private_uploads" \
     && rm -rf "/app/public/uploads" \
     && mkdir -p "/app/data/uploads" && ln -fs "/app/data/uploads" "/app/public/uploads" \
