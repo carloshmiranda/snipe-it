@@ -6,6 +6,7 @@ use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Transformers\LicenseSeatsTransformer;
 use App\Http\Transformers\LicensesTransformer;
+use App\Http\Transformers\SelectlistTransformer;
 use App\Models\Company;
 use App\Models\License;
 use App\Models\LicenseSeat;
@@ -82,7 +83,7 @@ class LicensesController extends Controller
         }
 
 
-        $offset = request('offset', 0);
+        $offset = (($licenses) && (request('offset') > $licenses->count())) ? 0 : request('offset', 0);
         $limit = request('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
 
@@ -230,10 +231,6 @@ class LicensesController extends Controller
             $offset = request('offset', 0);
             $limit = request('limit', 50);
 
-            if($seats->count() < $offset){
-                $offset = 0;
-            }
-
             $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
             $total = $seats->count();
 
@@ -251,6 +248,30 @@ class LicensesController extends Controller
 
         return response()->json(Helper::formatStandardApiResponse('error', null, trans('admin/licenses/message.does_not_exist')), 200);
 
+    }
+
+    
+    /**
+     * Gets a paginated collection for the select2 menus
+     *
+     * @see \App\Http\Transformers\SelectlistTransformer
+     */
+    public function selectlist(Request $request)
+    {
+
+        $licenses = License::select([
+            'licenses.id',
+            'licenses.name'
+        ]);
+
+        if ($request->filled('search')) {
+            $licenses = $licenses->where('licenses.name', 'LIKE', '%'.$request->get('search').'%');
+        }
+
+        $licenses = $licenses->orderBy('name', 'ASC')->paginate(50);
+
+
+        return (new SelectlistTransformer)->transformSelectlist($licenses);
     }
 
 

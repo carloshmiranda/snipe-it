@@ -4,6 +4,7 @@
 | asset tag           | asset_tag        | Asset                                     |
 | category            | category         | All                                       |
 | company             | company          | All                                       |
+| department_id       |                  | User ? All                                |
 | item name           | item_name        | All                                       |
 | image               | image            | Asset                                     |
 | department_id       |                  | User ? All                                |
@@ -13,7 +14,6 @@
 | licensed to email   | license_email    | License                                   |
 | licensed to name    | license_name     | License                                   |
 | maintained          | maintained       | License                                   |
-| manager_id          |                  | User                                      |
 | manufacturer        | manufacturer     | All                                       |
 | model name          | asset_model      | Asset                                     |
 | model number        | model_number     | Asset                                     |
@@ -34,3 +34,4 @@
 | name                |                  |                                           |
 | email               |                  |                                           |
 | username            |                  |                                           |
+

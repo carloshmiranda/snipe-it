@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\Department;
-use App\Http\Transformers\DepartmentsTransformer;
 use App\Helpers\Helper;
-use Auth;
+use App\Http\Controllers\Controller;
+use App\Http\Transformers\DepartmentsTransformer;
 use App\Http\Transformers\SelectlistTransformer;
+use App\Models\Department;
+use Auth;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class DepartmentsController extends Controller
@@ -40,7 +40,7 @@ class DepartmentsController extends Controller
             $departments = $departments->TextSearch($request->input('search'));
         }
 
-        $offset = $request->input('offset', 0);
+        $offset = (($departments) && (request('offset') > $departments->count())) ? 0 : request('offset', 0);
         $limit = $request->input('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';

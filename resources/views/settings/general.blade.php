@@ -61,7 +61,7 @@
                     <!-- Require signature for acceptance -->
                     <div class="form-group {{ $errors->has('require_accept_signature') ? 'error' : '' }}">
                         <div class="col-md-3">
-                            {{ Form::label('full_multiple_companies_support',
+                            {{ Form::label('require_accept_signature',
                                            trans('admin/settings/general.require_accept_signature')) }}
                         </div>
                         <div class="col-md-9">
@@ -106,6 +106,10 @@
                         <div class="col-md-9">
                             {!! Form::username_format('username_format', Input::old('username_format', $setting->username_format), 'select2') !!}
                             {!! $errors->first('username_format', '<span class="alert-msg">:message</span>') !!}
+
+                            <p class="help-block">
+                                {{ trans('admin/settings/general.username_format_help') }}
+                            </p>
                         </div>
                     </div>
 
@@ -118,9 +122,7 @@
                                {{ Form::checkbox('show_images_in_email', '1', Input::old('show_images_in_email', $setting->show_images_in_email),array('class' => 'minimal')) }}
                                {{ trans('general.yes') }}
                                {!! $errors->first('show_images_in_email', '<span class="alert-msg">:message</span>') !!}
-                               <p class="help-block">
-                                   {{ trans('admin/settings/general.show_images_in_email_help') }}
-                               </p>
+
                            </div>
                        </div>
 
@@ -166,7 +168,7 @@
                     <!-- Default EULA -->
                    <div class="form-group {{ $errors->has('default_eula_text') ? 'error' : '' }}">
                        <div class="col-md-3">
-                           {{ Form::label('per_page', trans('admin/settings/general.default_eula_text')) }}
+                           {{ Form::label('default_eula_text', trans('admin/settings/general.default_eula_text')) }}
                        </div>
                        <div class="col-md-9">
                            {{ Form::textarea('default_eula_text', Input::old('default_eula_text', $setting->default_eula_text), array('class' => 'form-control','placeholder' => 'Add your default EULA text')) }}

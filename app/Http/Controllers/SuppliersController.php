@@ -1,12 +1,9 @@
 <?php
 namespace App\Http\Controllers;
 
-use Image;
+use App\Http\Requests\ImageUploadRequest;
 use App\Models\Supplier;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use App\Http\Requests\ImageUploadRequest;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * This controller handles all actions related to Suppliers for
@@ -26,10 +23,9 @@ class SuppliersController extends Controller
     {
         // Grab all the suppliers
         $this->authorize('view', Supplier::class);
-        $suppliers = Supplier::orderBy('created_at', 'DESC')->get();
 
         // Show the page
-        return view('suppliers/index', compact('suppliers'));
+        return view('suppliers/index');
     }
 
 

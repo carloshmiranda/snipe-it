@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Http\Transformers\ConsumablesTransformer;
+use App\Http\Transformers\SelectlistTransformer;
 use App\Models\Company;
 use App\Models\Consumable;
-use App\Http\Transformers\ConsumablesTransformer;
-use App\Helpers\Helper;
+use Illuminate\Http\Request;
 
 class ConsumablesController extends Controller
 {
@@ -35,12 +36,16 @@ class ConsumablesController extends Controller
             $consumables->where('company_id','=',$request->input('company_id'));
         }
 
+        if ($request->filled('category_id')) {
+            $consumables->where('category_id','=',$request->input('category_id'));
+        }
+
         if ($request->filled('manufacturer_id')) {
             $consumables->where('manufacturer_id','=',$request->input('manufacturer_id'));
         }
 
 
-        $offset = request('offset', 0);
+        $offset = (($consumables) && (request('offset') > $consumables->count())) ? 0 : request('offset', 0);
         $limit = request('limit', 50);
         $allowed_columns = ['id','name','order_number','min_amt','purchase_date','purchase_cost','company','category','model_number', 'item_no', 'manufacturer','location','qty','image'];
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
@@ -186,5 +191,29 @@ class ConsumablesController extends Controller
         $consumableCount = $consumable->users->count();
         $data = array('total' => $consumableCount, 'rows' => $rows);
         return $data;
+    }
+
+    /**
+    * Gets a paginated collection for the select2 menus
+    *
+    * @see \App\Http\Transformers\SelectlistTransformer
+    *
+    */
+    public function selectlist(Request $request)
+    {
+
+        $consumables = Consumable::select([
+            'consumables.id',
+            'consumables.name'
+        ]);
+
+        if ($request->filled('search')) {
+            $consumables = $consumables->where('consumables.name', 'LIKE', '%'.$request->get('search').'%');
+        }
+
+        $consumables = $consumables->orderBy('name', 'ASC')->paginate(50);
+
+
+        return (new SelectlistTransformer)->transformSelectlist($consumables);
     }
 }

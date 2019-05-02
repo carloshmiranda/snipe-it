@@ -2,15 +2,13 @@
 
 namespace App\Models;
 
-use Parsedown;
-use App\Events\SettingSaved;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
-use Watson\Validating\ValidatingTrait;
-use Schema;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
+use Parsedown;
+use Watson\Validating\ValidatingTrait;
 
 /**
  * Settings model.
@@ -41,15 +39,6 @@ class Setting extends Model
      * @var bool
      */
     protected $injectUniqueIdentifier = true;
-
-    /**
-     * The event map for the model.
-     *
-     * @var array
-     */
-    protected $dispatchesEvents = [
-        'saved' => SettingSaved::class,
-    ];
 
     /**
      * Model rules.
@@ -215,6 +204,8 @@ class Setting extends Model
         // Needed for modifying the bootstrap nav :(
         $custom_css = str_ireplace('script', 'SCRIPTS-NOT-ALLOWED-HERE', $custom_css);
         $custom_css = str_replace('&gt;', '>', $custom_css);
+        // Allow String output (needs quotes)
+        $custom_css = str_replace('&quot;', '"', $custom_css);
 
         return $custom_css;
     }
@@ -320,9 +311,9 @@ class Setting extends Model
 
     /**
      * Get the specific LDAP settings
-     * 
+     *
      * @author Wes Hulette <jwhulette@gmail.com>
-     * 
+     *
      * @since 5.0.0
      *
      * @return Collection
@@ -330,7 +321,7 @@ class Setting extends Model
     public static function getLdapSettings(): Collection
     {
         $ldapSettings = self::select([
-            'ldap_enabled', 
+            'ldap_enabled',
             'ldap_server',
             'ldap_uname',
             'ldap_pword',
@@ -354,5 +345,4 @@ class Setting extends Model
 
         return collect($ldapSettings);
     }
-
 }

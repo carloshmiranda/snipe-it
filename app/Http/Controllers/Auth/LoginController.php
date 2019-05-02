@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Services\LdapAd;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\ThrottlesLogins;
 use App\Models\Setting;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use App\Services\LdapAd;
+use Com\Tecnick\Barcode\Barcode;
+use Google2FA;
+use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
+use Log;
 use Redirect;
-use Illuminate\Support\Facades\Log;
 
 /**
  * This controller handles authentication for the user, including local
@@ -99,7 +101,7 @@ class LoginController extends Controller
     {
         $remote_user = $request->server('REMOTE_USER');
         if (Setting::getSettings()->login_remote_user_enabled == "1" && isset($remote_user) && !empty($remote_user)) {
-            LOG::debug("Authenticatiing via REMOTE_USER.");
+            Log::debug("Authenticatiing via REMOTE_USER.");
 
             $pos = strpos($remote_user, '\\');
             if ($pos > 0) {
@@ -108,10 +110,10 @@ class LoginController extends Controller
             
             try {
                 $user = User::where('username', '=', $remote_user)->whereNull('deleted_at')->where('activated', '=', '1')->first();
-                LOG::debug("Remote user auth lookup complete");
+                Log::debug("Remote user auth lookup complete");
                 if(!is_null($user)) Auth::login($user, true);
             } catch(Exception $e) {
-                LOG::error("There was an error authenticating the Remote user: " . $e->getMessage());
+                Log::debug("There was an error authenticating the Remote user: " . $e->getMessage());
             }
         }
     }
@@ -154,13 +156,13 @@ class LoginController extends Controller
             // If the user was unable to login via LDAP, log the error and let them fall through to
             // local authentication.
             } catch (\Exception $e) {
-                LOG::error("There was an error authenticating the LDAP user: ".$e->getMessage());
+                Log::debug("There was an error authenticating the LDAP user: ".$e->getMessage());
             }
         }
 
         // If the user wasn't authenticated via LDAP, skip to local auth
         if (!$user) {
-            LOG::debug("Authenticating user against database.");
+            Log::debug("Authenticating user against database.");
           // Try to log the user in
             if (!Auth::attempt(['username' => $request->input('username'), 'password' => $request->input('password'), 'activated' => 1], $request->input('remember'))) {
 
@@ -168,7 +170,7 @@ class LoginController extends Controller
                     $this->incrementLoginAttempts($request);
                 }
 
-                LOG::debug("Local authentication failed.");
+                Log::debug("Local authentication failed.");
                 return redirect()->back()->withInput()->with('error', trans('auth/message.account_not_found'));
             } else {
 
@@ -194,27 +196,46 @@ class LoginController extends Controller
     public function getTwoFactorEnroll()
     {
 
+        // Make sure the user is logged in
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'You must be logged in.');
+            return redirect()->route('login')->with('error', trans('auth/general.login_prompt'));
         }
 
+
+        $settings = Setting::getSettings();
         $user = Auth::user();
-        $google2fa = app()->make('pragmarx.google2fa');
 
-        if ($user->two_factor_secret=='') {
-            $user->two_factor_secret = $google2fa->generateSecretKey(32);
-            $user->save();
+        // We wouldn't normally see this page if 2FA isn't enforced via the
+        // \App\Http\Middleware\CheckForTwoFactor middleware AND if a device isn't enrolled,
+        // but let's check check anyway in case there's a browser history or back button thing.
+        // While you can access this page directly, enrolling a device when 2FA isn't enforced
+        // won't cause any harm.
+
+        if (($user->two_factor_secret!='') && ($user->two_factor_enrolled==1)) {
+            return redirect()->route('two-factor')->with('error', trans('auth/message.two_factor.already_enrolled'));
         }
 
+        $secret = Google2FA::generateSecretKey();
+        $user->two_factor_secret = $secret;
+        $user->save();
 
-        $google2fa_url = $google2fa->getQRCodeInline(
-            urlencode(Setting::getSettings()->site_name),
-            urlencode($user->username),
-            $user->two_factor_secret
-        );
+        $barcode = new Barcode();
+        $barcode_obj =
+            $barcode->getBarcodeObj(
+                'QRCODE',
+                sprintf(
+                    'otpauth://totp/%s:%s?secret=%s&issuer=Snipe-IT&period=30',
+                    urlencode($settings->site_name),
+                    urlencode($user->username),
+                    urlencode($secret)
+                ),
+                300,
+                300,
+                'black',
+                [-2, -2, -2, -2]
+            );
 
-        return view('auth.two_factor_enroll')->with('google2fa_url', $google2fa_url);
-
+        return view('auth.two_factor_enroll')->with('barcode_obj', $barcode_obj);
     }
 
 
@@ -225,6 +246,20 @@ class LoginController extends Controller
      */
     public function getTwoFactorAuth()
     {
+        // Check that the user is logged in
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', trans('auth/general.login_prompt'));
+        }
+
+        $user = Auth::user();
+
+        // Check whether there is a device enrolled.
+        // This *should* be handled via the \App\Http\Middleware\CheckForTwoFactor middleware
+        // but we're just making sure (in case someone edited the database directly, etc)
+        if (($user->two_factor_secret=='') || ($user->two_factor_enrolled!=1)) {
+            return redirect()->route('two-factor-enroll');
+        }
+
         return view('auth.two_factor');
     }
 
@@ -239,22 +274,28 @@ class LoginController extends Controller
     {
 
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'You must be logged in.');
+            return redirect()->route('login')->with('error', trans('auth/general.login_prompt'));
+        }
+
+        if (!$request->has('two_factor_secret')) {
+            return redirect()->route('two-factor')->with('error', trans('auth/message.two_factor.code_required'));
+        }
+
+        if (!$request->has('two_factor_secret')) {
+            return redirect()->route('two-factor')->with('error', 'Two-factor code is required.');
         }
 
         $user = Auth::user();
-        $secret = $request->get('two_factor_secret');
-        $google2fa = app()->make('pragmarx.google2fa');
-        $valid = $google2fa->verifyKey($user->two_factor_secret, $secret);
+        $secret = $request->input('two_factor_secret');
 
-        if ($valid) {
+        if (Google2FA::verifyKey($user->two_factor_secret, $secret)) {
             $user->two_factor_enrolled = 1;
             $user->save();
             $request->session()->put('2fa_authed', 'true');
             return redirect()->route('home')->with('success', 'You are logged in!');
         }
 
-        return redirect()->route('two-factor')->with('error', 'Invalid two-factor code');
+        return redirect()->route('two-factor')->with('error', trans('auth/message.two_factor.invalid_code'));
 
 
     }
@@ -279,7 +320,7 @@ class LoginController extends Controller
             return redirect()->away($customLogoutUrl);
         }
 
-        return redirect()->route('login')->with('success', 'You have successfully logged out!');
+        return redirect()->route('login')->with('success',  trans('auth/general.logout.success'));
     }
 
 
@@ -304,11 +345,11 @@ class LoginController extends Controller
     }
 
     /**
-    * Redirect the user after determining they are locked out.
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @return \Illuminate\Http\RedirectResponse
-    */
+     * Redirect the user after determining they are locked out.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     protected function sendLockoutResponse(Request $request)
     {
         $seconds = $this->limiter()->availableIn(
@@ -319,18 +360,18 @@ class LoginController extends Controller
 
         $message = \Lang::get('auth/message.throttle', ['minutes' => $minutes]);
 
-            return redirect()->back()
+        return redirect()->back()
             ->withInput($request->only($this->username(), 'remember'))
             ->withErrors([$this->username() => $message]);
     }
 
 
     /**
-    * Override the lockout time and duration
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @return  bool
-    */
+     * Override the lockout time and duration
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
     protected function hasTooManyLoginAttempts(Request $request)
     {
         $lockoutTime = config('auth.throttle.lockout_duration');

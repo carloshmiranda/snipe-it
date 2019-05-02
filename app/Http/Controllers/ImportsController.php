@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Transformers\ImportsTransformer;
-use App\Models\Import;
 use App\Models\Asset;
-
+use App\Models\Import;
 
 class ImportsController extends Controller
 {
@@ -15,7 +14,7 @@ class ImportsController extends Controller
      */
     public function index()
     {
-        $this->authorize('create', Asset::class);
+        $this->authorize('import');
         $imports = (new ImportsTransformer)->transformImports(Import::latest()->get());
         return view('importer/import')->with('imports', $imports);
     }

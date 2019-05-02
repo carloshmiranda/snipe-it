@@ -2,20 +2,20 @@
 namespace App\Providers;
 
 
-use Illuminate\Support\ServiceProvider;
-use Log;
-use Illuminate\Support\Facades\Schema;
-use App\Observers\AssetObserver;
-use App\Observers\LicenseObserver;
-use App\Observers\AccessoryObserver;
-use App\Observers\ConsumableObserver;
-use App\Observers\ComponentObserver;
-use App\Models\Asset;
-use App\Models\License;
 use App\Models\Accessory;
-use App\Models\Consumable;
+use App\Models\Asset;
 use App\Models\Component;
-
+use App\Models\Consumable;
+use App\Models\License;
+use App\Models\Setting;
+use App\Observers\AccessoryObserver;
+use App\Observers\AssetObserver;
+use App\Observers\ComponentObserver;
+use App\Observers\ConsumableObserver;
+use App\Observers\LicenseObserver;
+use App\Observers\SettingObserver;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\ServiceProvider;
 
 /**
  * This service provider handles setting the observers on models
@@ -41,8 +41,7 @@ class AppServiceProvider extends ServiceProvider
         Component::observe(ComponentObserver::class);
         Consumable::observe(ConsumableObserver::class);
         License::observe(LicenseObserver::class);
-
-
+        Setting::observe(SettingObserver::class);
     }
 
     /**

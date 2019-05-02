@@ -1,24 +1,22 @@
 <?php
 namespace App\Models;
 
+use App\Http\Traits\UniqueUndeletedTrait;
 use App\Models\Traits\Searchable;
 use App\Presenters\Presentable;
-use Illuminate\Auth\Passwords\CanResetPassword;
-use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use DB;
 use Illuminate\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Watson\Validating\ValidatingTrait;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Http\Traits\UniqueUndeletedTrait;
+use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-use Illuminate\Contracts\Translation\HasLocalePreference;
-use DB;
-
-
+use Watson\Validating\ValidatingTrait;
 
 class User extends SnipeModel implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract, HasLocalePreference
 {
@@ -50,6 +48,7 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
         'manager_id',
         'password',
         'phone',
+        'notes',
         'state',
         'username',
         'zip',
@@ -383,7 +382,7 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
      */
     public function managedLocations()
     {
-        return $this->hasMany('\App\Models\Location', 'manager_id')->withTrashed();
+        return $this->hasMany('\App\Models\Location', 'manager_id');
     }
 
     /**
@@ -509,6 +508,9 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
             } elseif ($format=='lastnamefirstinitial') {
                 $username = str_slug($last_name.substr($first_name, 0, 1));
 
+            } elseif ($format=='firstintial.lastname') {
+                $username = substr($first_name, 0, 1).'.'.str_slug($last_name);
+
             } elseif ($format=='firstname_lastname') {
                 $username = str_slug($first_name).'_'.str_slug($last_name);
 
@@ -526,7 +528,11 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
     }
 
     /**
-     * Check whether two-factor authorization is required and the user has activated it
+     * Check whether two-factor authorization is requiredfor this user
+     *
+     * 0 = 2FA disabled
+     * 1 = 2FA optional
+     * 2 = 2FA universally required
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v4.0]
@@ -535,10 +541,45 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
      */
     public function two_factor_active () {
 
-        if (Setting::getSettings()->two_factor_enabled !='0') {
-            if (($this->two_factor_optin =='1') && ($this->two_factor_enrolled)) {
-                return true;
-            }
+        // If the 2FA is optional and the user has opted in
+        if ((Setting::getSettings()->two_factor_enabled =='1') && ($this->two_factor_optin =='1'))
+        {
+            return true;
+        }
+        // If the 2FA is required for everyone so is implicitly active
+        elseif (Setting::getSettings()->two_factor_enabled =='2')
+        {
+            return true;
+        }
+
+        return false;
+
+    }
+
+    /**
+     * Check whether two-factor authorization is required and the user has activated it
+     * and enrolled a device
+     *
+     * 0 = 2FA disabled
+     * 1 = 2FA optional
+     * 2 = 2FA universally required
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v4.6.14]
+     *
+     * @return bool
+     */
+    public function two_factor_active_and_enrolled () {
+
+        // If the 2FA is optional and the user has opted in and is enrolled
+        if ((Setting::getSettings()->two_factor_enabled =='1') && ($this->two_factor_optin =='1') && ($this->two_factor_enrolled =='1'))
+        {
+            return true;
+        }
+        // If the 2FA is required for everyone and the user has enrolled
+        elseif ((Setting::getSettings()->two_factor_enabled =='2') && ($this->two_factor_enrolled))
+        {
+            return true;
         }
         return false;
 
@@ -549,6 +590,25 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
     {
         return json_decode($this->permissions, true);
     }
+
+    /**
+     * Query builder scope to search user by name with spaces in it.
+     * We don't use the advancedTextSearch() scope because that searches
+     * all of the relations as well, which is more than what we need.
+     *
+     * @param  \Illuminate\Database\Query\Builder $query Query builder instance
+     * @param  array  $terms The search terms
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function scopeSimpleNameSearch($query,  $search) {
+
+           $query = $query->where('first_name', 'LIKE', '%'.$search.'%')
+               ->orWhere('last_name', 'LIKE', '%'.$search.'%')
+               ->orWhereRaw('CONCAT('.DB::getTablePrefix().'users.first_name," ",'.DB::getTablePrefix().'users.last_name) LIKE ?', ["%$search%", "%$search%"]);
+        return $query;
+    }
+
+
 
     /**
      * Run additional, advanced searches.

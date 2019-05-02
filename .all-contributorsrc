@@ -1803,6 +1803,42 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "colin-campbell",
+      "name": "Colin Campbell",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1169963?v=4",
+      "profile": "https://digitalist.se",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "lubo",
+      "name": "Ľubomír Kučera",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/2872098?v=4",
+      "profile": "https://github.com/lubo",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Mezzle",
+      "name": "Martin Meredith",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/570639?v=4",
+      "profile": "https://www.sourceguru.net",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "timothyfarmer",
+      "name": "Tim Farmer",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/7632599?v=4",
+      "profile": "https://github.com/timothyfarmer",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }

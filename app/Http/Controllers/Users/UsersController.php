@@ -4,39 +4,19 @@ namespace App\Http\Controllers\Users;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\UserNotFoundException;
-use App\Http\Requests\AssetFileRequest;
 use App\Http\Requests\SaveUserRequest;
-use App\Models\Accessory;
-use App\Models\Actionlog;
 use App\Models\Asset;
 use App\Models\Company;
 use App\Models\Group;
 use App\Models\Ldap;
-use App\Models\License;
-use App\Models\LicenseSeat;
-use App\Models\Location;
-use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\WelcomeNotification;
-use Artisan;
 use Auth;
-use Config;
-use Crypt;
-use DB;
-use Gate;
-use HTML;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
 use Input;
-use Lang;
-use League\Csv\Reader;
-use Mail;
 use Redirect;
-use Response;
 use Str;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use URL;
 use View;
 
 /**
@@ -256,9 +236,7 @@ class UsersController extends Controller
 
         // Only save groups if the user is a super user
         if (Auth::user()->isSuperUser()) {
-            if ($request->filled('groups')) {
-                $user->groups()->sync($request->input('groups'));
-            }
+            $user->groups()->sync($request->input('groups'));
         }
 
 

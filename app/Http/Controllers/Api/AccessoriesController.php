@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Helpers\Helper;
-use App\Models\Accessory;
+use App\Http\Controllers\Controller;
 use App\Http\Transformers\AccessoriesTransformer;
+use App\Http\Transformers\SelectlistTransformer;
+use App\Models\Accessory;
 use App\Models\Company;
-
+use Illuminate\Http\Request;
 
 class AccessoriesController extends Controller
 {
@@ -46,7 +46,7 @@ class AccessoriesController extends Controller
             $accessories->where('supplier_id','=',$request->input('supplier_id'));
         }
 
-        $offset = $request->input('offset', 0);
+        $offset = (($accessories) && (request('offset') > $accessories->count())) ? 0 : request('offset', 0);
         $limit = $request->input('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';
@@ -141,18 +141,27 @@ class AccessoriesController extends Controller
             return ['total' => 0, 'rows' => []];
         }
 
+        $offset = request('offset', 0);
+        $limit = request('limit', 50);
+
         $accessory->lastCheckoutArray = $accessory->lastCheckout->toArray();
         $accessory_users = $accessory->users;
-        
+        $total = $accessory_users->count();
+
+        if($total < $offset){
+            $offset = 0;
+        }
+
+        $accessory_users = $accessory->users()->skip($offset)->take($limit)->get();
+
         if ($request->filled('search')) {
             $accessory_users = $accessory->users()
                                 ->where('first_name', 'like', '%'.$request->input('search').'%')
                                 ->orWhere('last_name', 'like', '%'.$request->input('search').'%')
                                 ->get();
+            $total = $accessory_users->count();
         }
-
-        $total = $accessory_users->count();
-    
+        
         return (new AccessoriesTransformer)->transformCheckedoutAccessory($accessory, $accessory_users, $total);
     }
 
@@ -200,5 +209,29 @@ class AccessoriesController extends Controller
         $accessory->delete();
         return response()->json(Helper::formatStandardApiResponse('success', null,  trans('admin/accessories/message.delete.success')));
 
+    }
+    
+    /**
+    * Gets a paginated collection for the select2 menus
+    *
+    * @see \App\Http\Transformers\SelectlistTransformer
+    *
+    */
+    public function selectlist(Request $request)
+    {
+
+        $accessories = Accessory::select([
+            'accessories.id',
+            'accessories.name'
+        ]);
+
+        if ($request->filled('search')) {
+            $accessories = $accessories->where('accessories.name', 'LIKE', '%'.$request->get('search').'%');
+        }
+
+        $accessories = $accessories->orderBy('name', 'ASC')->paginate(50);
+
+
+        return (new SelectlistTransformer)->transformSelectlist($accessories);
     }
 }

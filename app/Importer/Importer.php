@@ -2,11 +2,11 @@
 namespace App\Importer;
 
 use App\Models\CustomField;
+use App\Models\Department;
 use App\Models\Setting;
 use App\Models\User;
 use ForceUTF8\Encoding;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use League\Csv\Reader;
 
@@ -29,6 +29,7 @@ abstract class Importer
      */
     private $defaultFieldMap = [
         'asset_tag' => 'asset tag',
+        'activated' => 'activated',
         'category' => 'category',
         'checkout_class' => 'checkout type', // Supports Location or User for assets.  Using checkout_class instead of checkout_type because type exists on asset already.
         'checkout_location' => 'checkout location',
@@ -67,7 +68,7 @@ abstract class Importer
         'first_name' => 'first name',
         'last_name' => 'last name',
         'department' => 'department',
-        'manager_first_name' => 'manager last name',
+        'manager_first_name' => 'manager first name',
         'manager_last_name' => 'manager last name',
     ];
     /**
@@ -187,10 +188,9 @@ abstract class Importer
     {
 
         $val = $default;
-
         $key = $this->lookupCustomKey($key);
 
-        $this->log("Custom Key: ${key}");
+        // $this->log("Custom Key: ${key}");
         if (array_key_exists($key, $array)) {
             $val = Encoding::toUTF8(trim($array[ $key ]));
         }
@@ -258,7 +258,10 @@ abstract class Importer
     }
 
     /**
-     * Finds the user matching given data, or creates a new one if there is no match
+     * Finds the user matching given data, or creates a new one if there is no match.
+     * This is NOT used by the User Import, only for Asset/Accessory/etc where
+     * there are users listed and we have to create them and associate them at
+     * the same time. [ALG]
      *
      * @author Daniel Melzter
      * @since 3.0
@@ -271,7 +274,10 @@ abstract class Importer
         $user_array = [
             'full_name' => $this->findCsvMatch($row, "full_name"),
             'email'     => $this->findCsvMatch($row, "email"),
-            'username'  => $this->findCsvMatch($row, "username")
+            'manager_id'=>  '',
+            'department_id' =>  '',
+            'username'  => $this->findCsvMatch($row, "username"),
+            'activated'  => $this->fetchHumanBoolean($this->findCsvMatch($row, 'activated')),
         ];
 
         // Maybe we're lucky and the user already exists.
@@ -300,6 +306,7 @@ abstract class Importer
         $user_formatted_array = User::generateFormattedNameFromFullName($user_array['full_name'], Setting::getSettings()->username_format);
         $user_array['first_name'] = $user_formatted_array['first_name'];
         $user_array['last_name'] = $user_formatted_array['last_name'];
+
         if (empty($user_array['username'])) {
             $user_array['username'] = $user_formatted_array['username'];
             if ($this->usernameFormat =='email') {
@@ -307,8 +314,9 @@ abstract class Importer
             }
         }
 
+        // Does this ever actually fire??
         // Check for a matching user after trying to guess username.
-        if($user = User::where('username', $user_array['username'])->first()) {
+        if ($user = User::where('username', $user_array['username'])->first()) {
             $this->log('User '.$user_array['username'].' already exists');
             return $user;
         }
@@ -328,6 +336,8 @@ abstract class Importer
         $user->department_id = $user_array['department_id'] ?? null;
         $user->activated     = 1;
         $user->password      = $this->tempPassword;
+
+        \Log::debug('Creating a user with the following attributes: '.print_r($user_array, true));
 
         if ($user->save()) {
             $this->log('User '.$user_array['username'].' created');
@@ -448,5 +458,56 @@ abstract class Importer
             return '1';
         }
         return '0';
+    }
+
+    /**
+     * Fetch an existing department, or create new if it doesn't exist
+     *
+     * @author A. Gianotto
+     * @since 4.6.5
+     * @param $user_department string
+     * @return int id of company created/found
+     */
+    public function createOrFetchDepartment($user_department_name)
+    {
+        if ($user_department_name!='') {
+            $department = Department::where('name', '=', $user_department_name)->first();
+
+            if ($department) {
+                $this->log('A matching Department ' . $user_department_name . ' already exists');
+                return $department->id;
+            }
+
+            $department = new Department();
+            $department->name = $user_department_name;
+
+            if ($department->save()) {
+                $this->log('Department ' . $user_department_name . ' was created');
+                return $department->id;
+            }
+            $this->logError($department, 'Department');
+        }
+
+        return null;
+    }
+
+    /**
+     * Fetch an existing manager
+     *
+     * @author A. Gianotto
+     * @since 4.6.5
+     * @param $user_manager string
+     * @return int id of company created/found
+     */
+    public function fetchManager($user_manager_first_name, $user_manager_last_name)
+    {
+        $manager = User::where('first_name', '=', $user_manager_first_name)
+            ->where('last_name', '=', $user_manager_last_name)->first();
+        if ($manager) {
+            $this->log('A matching Manager ' . $user_manager_first_name . ' '. $user_manager_last_name . ' already exists');
+            return $manager->id;
+        }
+        $this->log('No matching Manager ' . $user_manager_first_name . ' '. $user_manager_last_name . ' found. If their user account is being created through this import, you should re-process this file again. ');
+        return null;
     }
 }

@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Helpers\Helper;
-use App\Models\Supplier;
-use App\Http\Transformers\SuppliersTransformer;
+use App\Http\Controllers\Controller;
 use App\Http\Transformers\SelectlistTransformer;
+use App\Http\Transformers\SuppliersTransformer;
+use App\Models\Supplier;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
 
 class SuppliersController extends Controller
 {
@@ -34,7 +33,7 @@ class SuppliersController extends Controller
             $suppliers = $suppliers->TextSearch($request->input('search'));
         }
 
-        $offset = request('offset', 0);
+        $offset = (($suppliers) && (request('offset') > $suppliers->count())) ? 0 : request('offset', 0);
         $limit = $request->input('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';

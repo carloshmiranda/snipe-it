@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Helpers\Helper;
-use App\Models\Statuslabel;
-use App\Models\Asset;
-use App\Http\Transformers\StatuslabelsTransformer;
+use App\Http\Controllers\Controller;
 use App\Http\Transformers\AssetsTransformer;
+use App\Http\Transformers\StatuslabelsTransformer;
+use App\Models\Asset;
+use App\Models\Statuslabel;
+use Illuminate\Http\Request;
 
 class StatuslabelsController extends Controller
 {
@@ -30,7 +30,7 @@ class StatuslabelsController extends Controller
             $statuslabels = $statuslabels->TextSearch($request->input('search'));
         }
 
-        $offset = $request->input('offset', 0);
+        $offset = (($statuslabels) && (request('offset') > $statuslabels->count())) ? 0 : request('offset', 0);
         $limit = $request->input('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';

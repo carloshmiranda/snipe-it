@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Transformers\LicensesTransformer;
-use App\Models\License;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Transformers\UsersTransformer;
-use App\Models\Company;
-use App\Models\User;
 use App\Helpers\Helper;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveUserRequest;
-use App\Models\Asset;
+use App\Http\Transformers\AccessoriesTransformer;
 use App\Http\Transformers\AssetsTransformer;
+use App\Http\Transformers\LicensesTransformer;
 use App\Http\Transformers\SelectlistTransformer;
+use App\Http\Transformers\UsersTransformer;
+use App\Models\Asset;
+use App\Models\Company;
+use App\Models\License;
+use App\Models\User;
+use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
@@ -53,6 +54,7 @@ class UsersController extends Controller
             'users.phone',
             'users.state',
             'users.two_factor_enrolled',
+            'users.two_factor_optin',
             'users.updated_at',
             'users.username',
             'users.zip',
@@ -87,7 +89,7 @@ class UsersController extends Controller
         }
 
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
-        $offset = request('offset', 0);
+        $offset = (($users) && (request('offset') > $users->count())) ? 0 : request('offset', 0);
         $limit = request('limit',  20);
 
         switch ($request->input('sort')) {
@@ -149,8 +151,7 @@ class UsersController extends Controller
         $users = Company::scopeCompanyables($users);
 
         if ($request->filled('search')) {
-            $users = $users->where('first_name', 'LIKE', '%'.$request->get('search').'%')
-                ->orWhere('last_name', 'LIKE', '%'.$request->get('search').'%')
+            $users = $users->SimpleNameSearch($request->get('search'))
                 ->orWhere('username', 'LIKE', '%'.$request->get('search').'%')
                 ->orWhere('employee_num', 'LIKE', '%'.$request->get('search').'%');
         }
@@ -203,11 +204,12 @@ class UsersController extends Controller
 
 
         if ($user->save()) {
-            if ($request->filled('groups')) {
+            if ($request->has('groups')) {
                 $user->groups()->sync($request->input('groups'));
             } else {
                 $user->groups()->sync(array());
             }
+            
             return response()->json(Helper::formatStandardApiResponse('success', (new UsersTransformer)->transformUser($user), trans('admin/users/message.success.create')));
         }
         return response()->json(Helper::formatStandardApiResponse('error', null, $user->getErrors()));
@@ -327,6 +329,24 @@ class UsersController extends Controller
     }
 
     /**
+     * Return JSON containing a list of accessories assigned to a user.
+     *
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * @since [v4.6.14]
+     * @param $userId
+     * @return string JSON
+     */
+    public function accessories($id)
+    {
+        $this->authorize('view', User::class);
+        $user = User::findOrFail($id);
+        $this->authorize('view', Accessory::class);
+        $accessories = $user->accessories;
+        return (new AccessoriesTransformer)->transformAccessories($accessories, $accessories->count());
+    }
+
+    /**
+
      * Return JSON containing a list of licenses assigned to a user.
      *
      * @author [N. Mathar] [<snipe@snipe.net>]
@@ -344,6 +364,8 @@ class UsersController extends Controller
     }
 
     /**
+
+
      * Reset the user's two-factor status
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]

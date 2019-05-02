@@ -1,18 +1,16 @@
 <?php
 namespace App\Http\Controllers;
 
-use Image;
-use Input;
-use Redirect;
-use View;
-use Auth;
-use App\Helpers\Helper;
+use App\Http\Requests\ImageUploadRequest;
 use App\Models\Setting;
+use Auth;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\ImageUploadRequest;
 use Illuminate\Support\Facades\Storage;
+use Image;
+use Redirect;
+use View;
 
 /**
  * This controller handles all actions related to User Profiles for
@@ -146,8 +144,7 @@ class ProfileController extends Controller
 
         $rules = array(
             'current_password'     => 'required',
-            'password'         => Setting::passwordComplexityRulesSaving('store'),
-            'password_confirm' => 'required|same:password',
+            'password'         => Setting::passwordComplexityRulesSaving('store').'|confirmed',
         );
 
         $validator = \Validator::make($request->all(), $rules);

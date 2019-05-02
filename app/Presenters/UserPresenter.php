@@ -2,10 +2,6 @@
 
 namespace App\Presenters;
 
-use App\Helpers\Helper;
-use App\Models\Setting;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -227,14 +223,14 @@ class UserPresenter extends Presenter
             [
                 "field" => "two_factor_enrolled",
                 "searchable" => false,
-                "sortable" => false,
+                "sortable" => true,
                 "switchable" => true,
                 "title" => trans('admin/users/general.two_factor_enrolled'),
                 "visible" => false,
                 'formatter' => 'trueFalseFormatter'
             ],
             [
-                "field" => "two_factor_active",
+                "field" => "two_factor_activated",
                 "searchable" => false,
                 "sortable" => false,
                 "switchable" => true,
@@ -247,7 +243,7 @@ class UserPresenter extends Presenter
                 "searchable" => false,
                 "sortable" => true,
                 "switchable" => true,
-                "title" => trans('general.activated'),
+                "title" => trans('general.login_enabled'),
                 "visible" => true,
                 'formatter' => 'trueFalseFormatter'
             ],

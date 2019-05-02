@@ -492,6 +492,15 @@
                 </a>
             </li>
             @endcan
+            @can('view', \App\Models\PredefinedKit::class)
+                <li{!! (Request::is('kits') ? ' class="active"' : '') !!}>
+                    <a href="{{ route('kits.index') }}">
+                        <i class="fa fa-object-group"></i>
+                        <span>{{ trans('general.kits') }}</span>
+                    </a>
+                </li>
+            @endcan
+
             @can('view', \App\Models\User::class)
             <li{!! (Request::is('users*') ? ' class="active"' : '') !!}>
                   <a href="{{ route('users.index') }}">
@@ -500,7 +509,7 @@
                   </a>
             </li>
             @endcan
-            @can('create', \App\Models\Asset::class)
+            @can('import')
                 <li{!! (Request::is('import/*') ? ' class="active"' : '') !!}>
                     <a href="{{ route('imports.index') }}">
                         <i class="fa fa-cloud-download"></i>
@@ -664,6 +673,8 @@
             </a>
             </li>
             @endcan
+
+
           </ul>
         </section>
         <!-- /.sidebar -->
@@ -789,6 +800,7 @@
 
     @section('moar_scripts')
     @show
+
 
     <script nonce="{{ csrf_token() }}">
         $.validate({

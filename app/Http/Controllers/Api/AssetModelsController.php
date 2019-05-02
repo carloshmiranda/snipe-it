@@ -1,16 +1,15 @@
 <?php
 namespace App\Http\Controllers\Api;
 
-use App\Models\AssetModel;
-use App\Models\Asset;
-use App\Http\Controllers\Controller;
 use App\Helpers\Helper;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Http\Transformers\AssetModelsTransformer;
 use App\Http\Transformers\AssetsTransformer;
 use App\Http\Transformers\SelectlistTransformer;
+use App\Models\Asset;
+use App\Models\AssetModel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
 
 /**
  * This class controls all actions related to asset models for
@@ -61,7 +60,7 @@ class AssetModelsController extends Controller
             $assetmodels->TextSearch($request->input('search'));
         }
 
-        $offset = $request->input('offset', 0);
+        $offset = (($assetmodels) && (request('offset') > $assetmodels->count())) ? 0 : request('offset', 0);
         $limit = $request->input('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'models.created_at';
@@ -180,7 +179,7 @@ class AssetModelsController extends Controller
             try  {
                 Storage::disk('public')->delete('assetmodels/'.$assetmodel->image);
             } catch (\Exception $e) {
-                \Log::error($e);
+                \Log::info($e);
             }
         }
 
