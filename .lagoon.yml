@@ -19,6 +19,10 @@ tasks:
         command: php artisan migrate
         service: cli
     - run:
+        name: Run storage link
+        command: php artisan storage:link
+        service: cli
+    - run:
         name: Clear config
         command: php artisan config:clear
         service: cli
