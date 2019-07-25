@@ -45,7 +45,8 @@ RUN \
   && mkdir -p '/app/data/uploads/models' \
   && mkdir -p '/app/data/uploads/suppliers' \
   && mkdir -p '/app/dumps' \
-  && mkdir -p '/app/keys'
+  && mkdir -p '/app/keys' \
+  && mkdir -p '/app/storage/framework'
 
 RUN composer install --optimize-autoloader --apcu-autoloader
 
