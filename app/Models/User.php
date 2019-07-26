@@ -93,7 +93,7 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
 
     /**
      * The relations and their attributes that should be included when searching the model.
-     * 
+     *
      * @var array
      */
     protected $searchableRelations = [
@@ -473,7 +473,7 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
 
     /**
      * Generate email from full name
-     * 
+     *
      * @author A. Gianotto <snipe@snipe.net>
      * @since [v2.0]
      *
@@ -635,7 +635,7 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
      */
     public function scopeByGroup($query, $id) {
         return $query->whereHas('groups', function ($query) use ($id) {
-            $query->where('groups.id', '=', $id);
+            $query->where('permission_groups.id', '=', $id);
         });
     }
 

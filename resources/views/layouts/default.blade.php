@@ -751,7 +751,7 @@
         <div class="pull-right hidden-xs">
           @if ($snipeSettings->version_footer!='off')
               @if (($snipeSettings->version_footer=='on') || (($snipeSettings->version_footer=='admin') && (Auth::user()->isSuperUser()=='1')))
-                <b>Version</b> {{ config('version.app_version') }} - build {{ config('version.build_version') }} ({{ config('version.branch') }})
+                &nbsp; <b>Version</b> {{ config('version.app_version') }} - build {{ config('version.build_version') }} ({{ config('version.branch') }})
               @endif
           @endif
 
@@ -773,7 +773,7 @@
                   {!!  Parsedown::instance()->text(e($snipeSettings->footer_text))  !!}
               </div>
           @endif
-          
+
         <a target="_blank" href="https://snipeitapp.com" rel="noopener">Snipe-IT</a> is open source software, made with <i class="fa fa-heart" style="color: #a94442; font-size: 10px"></i> by <a href="https://twitter.com/snipeitapp" rel="noopener">@snipeitapp</a>.
       </footer>
 
@@ -824,7 +824,7 @@
         });
 
         $(function () {
-  
+
             $('[data-toggle="tooltip"]').tooltip();
             $('[data-toggle="popover"]').popover();
             $('.select2 span').addClass('needsclick');

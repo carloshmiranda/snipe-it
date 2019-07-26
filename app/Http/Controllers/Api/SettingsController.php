@@ -19,13 +19,13 @@ class SettingsController extends Controller
 
     /**
      * Test the ldap settings
-     * 
+     *
      * @author Wes Hulette <jwhulette@gmail.com>
-     * 
+     *
      * @since 5.0.0
-     * 
+     *
      * @param App\Models\LdapAd $ldap
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function ldapAdSettingsTest(LdapAd $ldap): JsonResponse

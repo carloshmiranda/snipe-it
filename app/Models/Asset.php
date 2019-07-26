@@ -35,15 +35,15 @@ class Asset extends Depreciable
 
     /**
      * Run after the checkout acceptance was declined by the user
-     * 
+     *
      * @param  User   $acceptedBy
      * @param  string $signature
-     */ 
+     */
     public function declinedCheckout(User $declinedBy, $signature) {
       $this->assigned_to = null;
       $this->assigned_type = null;
-      $this->accepted = null;      
-      $this->save();        
+      $this->accepted = null;
+      $this->save();
     }
 
 
@@ -82,7 +82,7 @@ class Asset extends Depreciable
         'model_id'        => 'required|integer|exists:models,id',
         'status_id'       => 'required|integer|exists:status_labels,id',
         'company_id'      => 'integer|nullable',
-        'warranty_months' => 'numeric|nullable',
+        'warranty_months' => 'numeric|nullable|digits_between:0,240',
         'physical'        => 'numeric|max:1|nullable',
         'checkout_date'   => 'date|max:10|min:10|nullable',
         'checkin_date'    => 'date|max:10|min:10|nullable',
@@ -124,27 +124,27 @@ class Asset extends Depreciable
 
     /**
      * The attributes that should be included when searching the model.
-     * 
+     *
      * @var array
      */
     protected $searchableAttributes = [
-      'name', 
-      'asset_tag', 
-      'serial', 
-      'order_number', 
-      'purchase_cost', 
-      'notes', 
+      'name',
+      'asset_tag',
+      'serial',
+      'order_number',
+      'purchase_cost',
+      'notes',
       'created_at',
-      'updated_at',      
-      'purchase_date', 
-      'expected_checkin', 
-      'next_audit_date', 
+      'updated_at',
+      'purchase_date',
+      'expected_checkin',
+      'next_audit_date',
       'last_audit_date'
     ];
 
     /**
      * The relations and their attributes that should be included when searching the model.
-     * 
+     *
      * @var array
      */
     protected $searchableRelations = [
@@ -1069,7 +1069,7 @@ class Asset extends Depreciable
     public function scopeDueOrOverdueForAudit($query, $settings)
     {
         $interval = $settings->audit_warning_days ?? 0;
-    
+
         return $query->whereNotNull('assets.next_audit_date')
             ->whereRaw("DATE_SUB(assets.next_audit_date, INTERVAL $interval DAY) <= '".Carbon::now()."'")
             ->where('assets.archived', '=', 0)
@@ -1229,9 +1229,7 @@ class Asset extends Depreciable
                     ->orWhere('assets.order_number', 'LIKE', '%'.$search.'%')
                     ->orWhere('assets.notes', 'LIKE', '%'.$search.'%');
             }
-            foreach (CustomField::all() as $field) {
-                $query->orWhere('assets.'.$field->db_column_name(), 'LIKE', "%$search%");
-            }
+
         })->withTrashed()->whereNull("assets.deleted_at"); //workaround for laravel bug
     }
 

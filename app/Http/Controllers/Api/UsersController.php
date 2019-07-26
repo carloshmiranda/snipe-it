@@ -102,6 +102,9 @@ class UsersController extends Controller
             case 'department':
                 $users = $users->OrderDepartment($order);
                 break;
+            case 'company':
+                $users = $users->OrderCompany($order);
+                break;
             default:
                 $allowed_columns =
                     [
@@ -204,12 +207,12 @@ class UsersController extends Controller
 
 
         if ($user->save()) {
-            if ($request->has('groups')) {
+            if ($request->filled('groups')) {
                 $user->groups()->sync($request->input('groups'));
             } else {
                 $user->groups()->sync(array());
             }
-            
+
             return response()->json(Helper::formatStandardApiResponse('success', (new UsersTransformer)->transformUser($user), trans('admin/users/message.success.create')));
         }
         return response()->json(Helper::formatStandardApiResponse('error', null, $user->getErrors()));
@@ -293,7 +296,7 @@ class UsersController extends Controller
         $this->authorize('delete', $user);
 
 
-        if ($user->assets()->count() > 0) {
+        if (($user->assets) && ($user->assets->count() > 0)) {
             return response()->json(Helper::formatStandardApiResponse('error', null,  trans('admin/users/message.error.delete_has_assets')));
         }
 

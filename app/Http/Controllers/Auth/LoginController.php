@@ -76,15 +76,15 @@ class LoginController extends Controller
 
     /**
      * Log in a user by LDAP
-     * 
+     *
      * @author Wes Hulette <jwhulette@gmail.com>
-     * 
+     *
      * @since 5.0.0
      *
      * @param Request $request
-     * 
+     *
      * @return User
-     * 
+     *
      * @throws \Exception
      */
     private function loginViaLdap(Request $request): User
@@ -107,7 +107,7 @@ class LoginController extends Controller
             if ($pos > 0) {
                 $remote_user = substr($remote_user, $pos + 1);
             };
-            
+
             try {
                 $user = User::where('username', '=', $remote_user)->whereNull('deleted_at')->where('activated', '=', '1')->first();
                 Log::debug("Remote user auth lookup complete");
@@ -277,7 +277,7 @@ class LoginController extends Controller
             return redirect()->route('login')->with('error', trans('auth/general.login_prompt'));
         }
 
-        if (!$request->has('two_factor_secret')) {
+        if (!$request->filled('two_factor_secret')) {
             return redirect()->route('two-factor')->with('error', trans('auth/message.two_factor.code_required'));
         }
 
@@ -320,7 +320,7 @@ class LoginController extends Controller
             return redirect()->away($customLogoutUrl);
         }
 
-        return redirect()->route('login')->with('success',  trans('auth/general.logout.success'));
+        return redirect()->route('login')->with('success',  trans('auth/message.logout.success'));
     }
 
 

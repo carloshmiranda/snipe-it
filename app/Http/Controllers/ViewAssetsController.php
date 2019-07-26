@@ -170,7 +170,7 @@ class ViewAssetsController extends Controller
         if ($asset->isRequestedBy(Auth::user())) {
             $asset->cancelRequest();
             $asset->decrement('requests_counter', 1);
-            
+
             $logaction->logaction('request canceled');
             $settings->notify(new RequestAssetCancelationNotification($data));
             return redirect()->route('requestable-assets')

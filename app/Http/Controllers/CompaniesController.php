@@ -138,7 +138,7 @@ final class CompaniesController extends Controller
             return redirect()->route('companies.index')
                 ->with('error', trans('admin/companies/message.not_found'));
         }
-        
+
         $this->authorize('delete', $company);
 
         try {

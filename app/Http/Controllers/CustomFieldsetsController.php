@@ -191,12 +191,12 @@ class CustomFieldsetsController extends Controller
         $this->authorize('update', $set);
 
         foreach ($set->fields as $field) {
-            if ($field->id == Input::get('field_id')) {
+            if ($field->id == $request->input('field_id')) {
                 return redirect()->route("fieldsets.show", [$id])->withInput()->withErrors(['field_id' => trans('admin/custom_fields/message.field.already_added')]);
             }
         }
 
-        $results=$set->fields()->attach(Input::get('field_id'), ["required" => (Input::get('required') == "on"),"order" => Input::get('order')]);
+        $results = $set->fields()->attach(Input::get('field_id'), ["required" => ($request->input('required') == "on"),"order" => $request->input('order', 1)]);
 
         return redirect()->route("fieldsets.show", [$id])->with("success", trans('admin/custom_fields/message.field.create.assoc_success'));
     }

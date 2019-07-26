@@ -227,7 +227,7 @@ class ManufacturersController extends Controller
 
     }
 
-   
+
 
 
 }
